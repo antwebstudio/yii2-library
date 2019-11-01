@@ -7,9 +7,10 @@ class BorrowBookForm extends \yii\base\Model {
     public $bookCopyId;
     public $userId;
     public $confirm;
-    public $borrowDays = 7;
+    public $borrowDays = 28;
     public $bookLimitPerMember = 2;
 
+	protected $_bookBorrowed;
     protected $_bookCopy;
     protected $_user;
 	
@@ -70,17 +71,27 @@ class BorrowBookForm extends \yii\base\Model {
         return $this->_user;
     }
 	
+	public function getBookBorrowedRecords() {
+		if (!isset($this->_bookBorrowed)) {
+			$this->_bookBorrowed = BookBorrow::find()->andWhere([
+				'user_id' => $this->user->id,
+				'returned_at' => null,
+				'returned_by' => null,
+			])->all();
+		}
+		return $this->_bookBorrowed;
+	}
+	
 	public function getBookBorrowedInfo() {
-		$borrow = BookBorrow::find()->andWhere([
-			'user_id' => $this->user->id,
-			'returned_at' => null,
-			'returned_by' => null,
-		]);
-		
 		$lines = [];
-		foreach ($borrow->all() as $record) {
+		foreach ($this->getBookBorrowedRecords() as $record) {
 			$lines[] = $record->bookCopy->book->title;
 		}
 		return $lines;
+	}
+	
+	public function refresh() {
+		$this->_bookBorrowed = null;
+		$this->_user = null;
 	}
 }

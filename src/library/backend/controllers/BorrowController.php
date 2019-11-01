@@ -22,11 +22,15 @@ class BorrowController extends \yii\web\Controller {
     public function actionIndex() {
         $model = $this->module->getFormModel('borrowBook');
 
-        if ($model->load(Yii::$app->request->post())) {
-            if ($model->confirm && $model->save()) {
-				Yii::$app->session->setFlash('library', 'Book borrow is successfully recorded. ');
-                return $this->redirect(['index']);
-            }
+        if ($model->load(Yii::$app->request->post()) && $model->confirm && $model->save()) {
+			Yii::$app->session->setFlash('library', 'Book borrow is successfully recorded. ');
+			
+			$model->refresh();
+			
+			$notification = new \ant\library\notifications\BookBorrowed($model->bookBorrowedRecords);
+			Yii::$app->notifier->send($model->user, $notification);
+			
+			return $this->redirect(['/library/backend/borrow/borrowed', 'user' => $model->user->id]);
         }
 
         return $this->render($this->action->id, [
@@ -56,6 +60,9 @@ class BorrowController extends \yii\web\Controller {
         if ($model->renewCount < 2) {
             $model->renew(14)->save();
             $model->refresh();
+			
+			$notification = new \ant\library\notifications\BookBorrowed($model);
+			Yii::$app->notifier->send($model->user, $notification);
 
             Yii::$app->session->setFlash('success', 'Successfully renewed, new expiry date: '.$model->expireAt);
 

@@ -2,7 +2,7 @@
 
 namespace ant\library\backend;
 
-class Module extends \yii\base\Module
+class Module extends \ant\library\Module
 {
 
     /**

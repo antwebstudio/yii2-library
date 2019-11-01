@@ -47,7 +47,7 @@ class MemberController extends \yii\web\Controller {
                 \Yii::$app->session->setFlash('success', 'Deposit is paid. ');
                 return $this->goBack(\Yii::$app->request->referrer);
             } else{
-                return $this->redirect($deposit->invoice->adminPanelPrivateRoute);
+                return $this->redirect($deposit->invoice->adminPanelRoute);
             }
         } else {
             $user = User::findOne($id);
@@ -59,7 +59,7 @@ class MemberController extends \yii\web\Controller {
 
                 if (!$deposit->save()) throw new \Exception(print_r($deposit->errors, 1));
 
-                return $this->redirect($invoice->adminPanelPrivateRoute);
+                return $this->redirect($invoice->adminPanelRoute);
             }
         }
         return $this->render($this->action->id, [

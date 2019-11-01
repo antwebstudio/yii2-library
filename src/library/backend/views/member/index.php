@@ -72,10 +72,10 @@ $this->title = 'Manage Members';
                         ],
                         'dropdown' => [
                             'items' => [
-                                ['label' => 'User Invoices', 'url' => ['/payment/invoice/index', 'user' => $model->id]],
-                                ['label' => 'Edit', 'url' => ['/user/user/update', 'id' => $model->id]],
-                                ['label' => 'Pay Deposit', 'linkOptions' => ['data-method' => 'post'], 'url' => ['/library/member/pay-deposit', 'id' => $model->id]],
-                                ['label' => 'Return Deposit', 'linkOptions' => ['data-method' => 'post'], 'url' => ['/library/member/return-deposit', 'id' => $model->id]],
+                                ['label' => 'User Invoices', 'url' => ['/payment/backend/invoice/index', 'user' => $model->id], 'linkOptions' => ['data-tester-link' => 'invoice']],
+                                ['label' => 'Edit', 'url' => ['/user/backend/user/update', 'id' => $model->id]],
+                                ['label' => 'Pay Deposit', 'linkOptions' => ['data-method' => 'post', 'data-tester-link' => 'pay-deposit'], 'url' => ['/library/backend/member/pay-deposit', 'id' => $model->id]],
+                                ['label' => 'Return Deposit', 'linkOptions' => ['data-method' => 'post'], 'url' => ['/library/backend/member/return-deposit', 'id' => $model->id]],
 								['label' => 'View Subscription', 'url' => ['/subscription/backend/subscription/user', 'user' => $model->id]],
                             ],
                         ],

@@ -6,4 +6,3 @@ return [
     'isCoreModule' => false,
 	'depends' => [],
 ];
-?>

@@ -22,11 +22,12 @@ $expiredBorrowDataProvider = new \yii\data\ActiveDataProvider([
                 <div class="panel-heading">Book Detail</div>
                 <div class="panel-body">
 					<?= \yii\widgets\DetailView::widget([
-						'model' => $model->bookCopy->book,
+						'model' => $model,
 						'attributes' => [
-							'id',
-							'title',
-							'languageText',
+							'bookCopy.book.id',
+							'bookCopy.book.title',
+							'bookCopy.book.languageText',
+							'bookBorrow.expireAt',
 						],
 					]) ?>
                 </div>

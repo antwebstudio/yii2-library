@@ -66,6 +66,9 @@ class CreateUserForm extends \ant\web\FormModel {
 				},
 				'as configurable' => [
 					'class' => 'ant\behaviors\ConfigurableModelBehavior',
+					'extraRules' => [
+						[['email'], 'email'],
+					],
 					'extraAttributeLabels' => [
 						'email' => 'Email 電郵',
 					]
@@ -85,7 +88,10 @@ class CreateUserForm extends \ant\web\FormModel {
 					'class' => 'ant\behaviors\ConfigurableModelBehavior',
 					'extraAttributeLabels' => [
 						'value' => 'I/C no. 身份證號',
-					]
+					],
+					'extraRules' => [
+						['value', 'ant\user\validators\MalaysiaIcOrAnyPassportValidator'],
+					],
 				],
 			],
 			'contact:optional' => [
@@ -117,14 +123,13 @@ class CreateUserForm extends \ant\web\FormModel {
 					'class' => 'ant\behaviors\ConfigurableModelBehavior',
 					'extraRules' => [
 						[['lastname', 'contact_number'], 'required'],
-						[['email'], 'email'],
 						['data', 'ant\validators\SerializableDataValidator', 'rules' => $this->scenario == self::SCENARIO_BACKEND ? [] : [
 							[['origin', 'city', 'language'], 'required'],
 							[['speciality', 'affiliation', 'interest'], 'required'],
 						]],
 					],
 					'extraAttributeLabels' => [
-						'lastname' => 'Name as IC 身份证姓名',
+						'lastname' => 'Name (as per IC) 姓名（根据身份证）',
 						'contact_number' => 'H/P no. 手機號碼',
 						'memberType' => 'Member Type 會員類別',
 						'data[origin]' => 'Place of Origin 來自哪裡',

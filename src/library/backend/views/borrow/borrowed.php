@@ -89,7 +89,7 @@ if ($tab == 'expired') {
             'template' => '{renew}',
             'buttons' => [
                 'renew' => function($url, $model, $key) {
-                    return Html::a('Renew', ['/library/borrow/renew', 'id' => $model->id], ['data-method' => 'post', 'class' => 'btn btn-default']);
+                    return Html::a('Renew', ['/library/backend/borrow/renew', 'id' => $model->id], ['data-method' => 'post', 'class' => 'btn btn-default']);
                 }
             ],
         ],

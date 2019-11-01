@@ -10,7 +10,8 @@ class ReturnController extends \yii\web\Controller {
 
         if ($model->load(Yii::$app->request->post())) {
             if ($model->confirm && $model->save()) {
-                return $this->redirect(['index']);
+				\Yii::$app->session->setFlash('success', 'Book is successfully returned. ');
+                return $this->redirect(['/library/backend/borrow/borrowed', 'user' => $model->user->id]);
             }
         }
 
