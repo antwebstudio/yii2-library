@@ -8,7 +8,7 @@ $generator = new Picqer\Barcode\BarcodeGeneratorSVG();
 ?>
 
 <?php $this->beginBlock('content-header-buttons') ?>
-    <?= Html::a('Print Stickers', ['sticker'], ['class' => 'btn btn-sm btn-primary']) ?>
+    <?= Html::a('Print Stickers', ['print-sticker'], ['class' => 'btn btn-sm btn-primary']) ?>
 <?php $this->endBlock() ?>
 
 <?php /*
@@ -61,7 +61,7 @@ $generator = new Picqer\Barcode\BarcodeGeneratorSVG();
 		//'updated_at',
 		//'updated_by',
 		[
-			'class' => 'yii\grid\ActionColumn',
+			'class' => 'ant\grid\ActionColumn',
 			'template' => '{view} {update} {delete} {mark-sticker-label}',
 			'buttons' => [
 				'mark-sticker-label' => function($url, $model) {

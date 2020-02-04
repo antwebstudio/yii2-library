@@ -38,6 +38,7 @@ class M181030065358_library_permission extends Migration
 			],
 			\ant\library\backend\controllers\BookCopyController::className() => [
                 'index' => ['View book copies list', [Role::ROLE_ADMIN]],
+                'print-sticker' => ['Print book copies sticker', [Role::ROLE_ADMIN]],
                 'sticker' => ['Print book copies sticker', [Role::ROLE_ADMIN]],
                 'ajax-list' => ['Get book copies list by ajax', [Role::ROLE_ADMIN]],
                 'delete' => ['Delete book copy', [Role::ROLE_ADMIN]],

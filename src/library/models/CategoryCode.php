@@ -23,7 +23,7 @@ class CategoryCode extends \yii\db\ActiveRecord
      */
     public static function tableName()
     {
-        return 'ks_library_category_code';
+        return '{{%library_category_code}}';
     }
 
     /**

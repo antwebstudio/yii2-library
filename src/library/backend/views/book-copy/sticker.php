@@ -1,4 +1,5 @@
 <?php
+use yii\helpers\Url;
 use yii\widgets\ListView;
 ?>
 <style>
@@ -19,9 +20,13 @@ use yii\widgets\ListView;
         }
     }
 </style>
+<?php if ($dataProvider->totalCount): ?>
 <script>
     window.print();
 </script>
+<?php endif ?>
+
+<a class="btn btn-primary d-print-none" href="<?= Url::to(['print-sticker']) ?>">Back</a>
 
 <div class="stickers clearfix">
     <?= ListView::widget([

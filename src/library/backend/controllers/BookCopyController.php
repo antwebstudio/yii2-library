@@ -41,10 +41,16 @@ class BookCopyController extends \yii\web\Controller
             'dataProvider' => $dataProvider,
         ]);
     }
+	
+	public function actionPrintSticker() {
+		return $this->render($this->action->id, [
+		]);
+	}
 
-    public function actionSticker($status = BookCopy::STICKER_LABEL_NEED_REPRINT) {
+    public function actionSticker($status = null, $date = null) {
 		$stickerPerPage = 30;
 		$pagePerPrint = 10;
+		$date = isset($date) && $date != '' ? explode(' - ', $date) : null;
 		
 		$query = BookCopy::find()->alias('bookCopy')->joinWith(['book' => function($q) { 
 				$q->alias('book')->joinWith('categories categories'); 
@@ -52,6 +58,10 @@ class BookCopyController extends \yii\web\Controller
 				
 		if (isset($status)) {
 			$query->andWhere(['bookCopy.sticker_label_status' => BookCopy::STICKER_LABEL_NEED_REPRINT]);
+		}
+		
+		if (isset($date)) {
+			$query->andWhere(['between', 'bookCopy.created_at', $date[0], $date[1]]);
 		}
 		
         $dataProvider = new ActiveDataProvider([

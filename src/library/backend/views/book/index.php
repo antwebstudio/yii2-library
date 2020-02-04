@@ -94,7 +94,7 @@ $columns = [
 	//'created_by',
 	//'updated_at',
 	//'updated_by',
-	['class' => 'yii\grid\ActionColumn'],
+	['class' => 'ant\grid\ActionColumn'],
 ];
 ?>
 

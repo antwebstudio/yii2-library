@@ -41,7 +41,7 @@ return [
 		// Needed for rbca migration, else error occured when run yii migrate
         'authManager' => [
             'class' => 'yii\rbac\DbManager',
-            'defaultRoles' => [\common\rbac\Role::ROLE_GUEST, \common\rbac\Role::ROLE_USER],
+            'defaultRoles' => [\ant\rbac\Role::ROLE_GUEST, \ant\rbac\Role::ROLE_USER],
         ],
         'user' => [
 			'class' => 'yii\web\User',

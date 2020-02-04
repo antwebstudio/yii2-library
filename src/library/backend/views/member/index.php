@@ -13,25 +13,34 @@ $this->title = 'Manage Members';
 		'email',
 		[
 			'label' => 'IC Number',
+            'format' => 'html',
 			'attribute' => 'identityId',
 			'value' => function($model) {
+				// IC Number
 				$userIc = $model->getIdentityId()->andWhere(['type' => 'ic'])->one();
-				return isset($userIc) ? $userIc->value : null;
+				$html = isset($userIc) ? $userIc->value : null;
+				
+				// Full name
+				return $html.'<p>('.$model->fullname.')</p>';
 			},
-		],
-		[
-			'attribute' => 'fullname',
 		],
         [
             'label' => 'Membership',
             'format' => 'html',
             'value' => function($model) {
+				// Membership
                 $isMember = $model->isMember;
-                $class = $isMember ? 'label-success' : 'label-warning';
+                $class = $isMember ? 'label-success badge-success' : 'label-warning badge-warning';
                 $label = $isMember ? 'Member' : 'Non-member';
                 $expireWord = $isMember ? 'Expire' : 'Expired';
                 $text = $model->membershipExpireAt ? $expireWord.' at '.$model->membershipExpireAt : '';
-                return '<span class="label '.$class.'">'.$label.'</span><p>'.$text.'</p>';
+                $html = '<span class="label badge '.$class.'">'.$label.'</span><p>'.$text.'</p>';
+				
+				// Deposit
+                $isPaid = \ant\library\models\DepositMoney::checkIsPaid($model->id);
+                $class = $isPaid ? 'label-success badge-success' : 'label-warning badge-warning';
+                $text = $isPaid ? 'Deposit Paid' : 'Deposit Unpaid';
+                return $html.'<span class="label badge '.$class.'">'.$text.'</span>';
             }
         ],
         [
@@ -47,38 +56,26 @@ $this->title = 'Manage Members';
 			},
         ],
         [
-            'label' => 'Deposit',
-            'format' => 'html',
-            'value' => function($model) {
-                $isPaid = \ant\library\models\DepositMoney::checkIsPaid($model->id);
-                $class = $isPaid ? 'label-success' : 'label-warning';
-                $text = $isPaid ? 'Paid' : 'Unpaid';
-                return '<span class="label '.$class.'">'.$text.'</span>';
-            }
-        ],
-        [
 			'class' => 'yii\grid\ActionColumn',
             'template' => '{renew} {payDeposit}',
 			'buttons' => [
 				'renew' => function($url, $model, $key) {
 
-                    return \yii\bootstrap\ButtonDropdown::widget([
+                    return \ant\grid\ActionColumn::dropdown([
                         'label' => 'Renew',
-                        'split' => true,
-                        'tagName' => 'a', // Needed so that href option work
+                        //'split' => true,
+                        //'tagName' => 'a', // Needed so that href option work
+						'url' => ['/member/backend/member/subscription', 'id' => $model->id],
                         'options' => [
-                            'href' => ['/member/backend/member/subscription', 'id' => $model->id],
                             'class' => 'btn-sm btn btn-default',
                         ],
-                        'dropdown' => [
-                            'items' => [
-                                ['label' => 'User Invoices', 'url' => ['/payment/backend/invoice/index', 'user' => $model->id], 'linkOptions' => ['data-tester-link' => 'invoice']],
-                                ['label' => 'Edit', 'url' => ['/user/backend/user/update', 'id' => $model->id]],
-                                ['label' => 'Pay Deposit', 'linkOptions' => ['data-method' => 'post', 'data-tester-link' => 'pay-deposit'], 'url' => ['/library/backend/member/pay-deposit', 'id' => $model->id]],
-                                ['label' => 'Return Deposit', 'linkOptions' => ['data-method' => 'post'], 'url' => ['/library/backend/member/return-deposit', 'id' => $model->id]],
-								['label' => 'View Subscription', 'url' => ['/subscription/backend/subscription/user', 'user' => $model->id]],
-                            ],
-                        ],
+						'items' => [
+							['label' => 'User Invoices', 'url' => ['/payment/backend/invoice/index', 'user' => $model->id], 'linkOptions' => ['data-tester-link' => 'invoice']],
+							['label' => 'Edit', 'url' => ['/user/backend/user/update', 'id' => $model->id]],
+							['label' => 'Pay Deposit', 'linkOptions' => ['data-method' => 'post', 'data-tester-link' => 'pay-deposit'], 'url' => ['/library/backend/member/pay-deposit', 'id' => $model->id]],
+							['label' => 'Return Deposit', 'linkOptions' => ['data-method' => 'post'], 'url' => ['/library/backend/member/return-deposit', 'id' => $model->id]],
+							['label' => 'View Subscription', 'url' => ['/subscription/backend/subscription/user', 'user' => $model->id]],
+						],
                     ]);
                 },
 			],

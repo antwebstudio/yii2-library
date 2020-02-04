@@ -28,7 +28,7 @@ if ($tab == 'expired') {
 	</div>
 <?php endif ?>
 
-<?= \yii\bootstrap\Tabs::widget([
+<?= \ant\widgets\Tabs::widget([
     'items' => [
         [
             'label' => 'All',

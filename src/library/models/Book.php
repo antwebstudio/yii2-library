@@ -118,6 +118,49 @@ class Book extends \yii\db\ActiveRecord
         ];
     }
 	
+	public static function importerConfig() {
+		return [
+			'book.title', // Need to specify model name before attribute name
+			'book.author_ids' => function($value) {
+				$value = (new \SteelyWing\Chinese\Chinese)->to(\SteelyWing\Chinese\Chinese::CHS, $value);
+				$author = \ant\library\models\BookAuthor::find()->andWhere(['name' => $value])->one();
+
+				if (!isset($author)) {
+					$author = new \ant\library\models\BookAuthor;
+					$author->name = $value;
+					if (!$author->save()) throw new \Exception(print_r($author->errors, 1));
+				}
+				return [$author->id];
+			},
+			'book.category_ids' => function($value) {
+				// Category Code
+				$code = \ant\library\models\CategoryCode::findOne(['udc' => $value]);
+				if (isset($code)) return [$code->category_id];
+				
+				// Title
+				$value = (new \SteelyWing\Chinese\Chinese)->to(\SteelyWing\Chinese\Chinese::CHS, $value);
+				$category = \ant\category\models\Category::ensureByTitle($value, 'book');
+				return [$category->id];
+			},
+			'book.category_code',
+			'book.language' => function($value) {
+				$value = (new \SteelyWing\Chinese\Chinese)->to(\SteelyWing\Chinese\Chinese::CHS, $value);
+				$nonChineseValue = strtoupper($value);
+				
+				if (in_array($value, ['中文', '华文', '华']) || in_array($nonChineseValue, ['CHINESE', 'CHI', 'C'])) {
+					return \ant\library\models\Book::LANGUAGE_CHINESE;
+				} else if (in_array($value, ['英文', '英']) || in_array($nonChineseValue, ['ENGLISH', 'ENG', 'E'])) {
+					return \ant\library\models\Book::LANGUAGE_ENGLISH;
+				} else if (in_array($value, ['马来文', '国文', '国']) || in_array($nonChineseValue, ['MALAY', 'M', 'BAHASA MELAYU'])) {
+					return \ant\library\models\Book::LANGUAGE_MALAY;
+				}
+			},
+			'book.adminUseTagsValue' => function($value) {
+				return \ant\helpers\ArrayHelper::trim(explode(',', $value));
+			}
+		];
+	}
+	
 	public function getLanguageText() {
 		switch ($this->language) {
 			case self::LANGUAGE_ENGLISH:

@@ -25,6 +25,15 @@ class BookCopy extends \yii\db\ActiveRecord
     {
         return '{{%library_book_copy}}';
     }
+	
+	public function behaviors() {
+		return [
+			[
+				'class' => \ant\behaviors\TimestampBehavior::class,
+				'updatedAtAttribute' => null,
+			],
+		];
+	}
 
     /**
      * {@inheritdoc}
