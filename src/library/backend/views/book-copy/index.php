@@ -9,6 +9,7 @@ $generator = new Picqer\Barcode\BarcodeGeneratorSVG();
 
 <?php $this->beginBlock('content-header-buttons') ?>
     <?= Html::a('Print Stickers', ['print-sticker'], ['class' => 'btn btn-sm btn-primary']) ?>
+    <?= Html::a('Re-print Stickers', ['print-sticker', 'status' => BookCopy::STICKER_LABEL_NEED_REPRINT], ['class' => 'btn btn-sm btn-primary']) ?>
 <?php $this->endBlock() ?>
 
 <?php /*

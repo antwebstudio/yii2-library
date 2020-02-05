@@ -41,7 +41,7 @@ use ant\library\models\BookPublisher;
             'allowClear' => true,
             'minimumInputLength' => 1,
             'ajax' => [
-                'url' => Url::to(['/category/category/ajax-list']),
+                'url' => Url::to(['/category/backend/category/ajax-list']),
                 'dataType' => 'json',
                 'delay' => 250,                
                 'data' => new JsExpression('function(params) { return { q:params.term, page: params.page }; }'),
@@ -71,7 +71,7 @@ use ant\library\models\BookPublisher;
             'allowClear' => true,
             'minimumInputLength' => 1,
             'ajax' => [
-                'url' => Url::to(['/library/author/ajax-authors']),
+                'url' => Url::to(['/library/backend/author/ajax-authors']),
                 'dataType' => 'json',
                 'delay' => 250,                
                 'data' => new JsExpression('function(params) { return { q:params.term, page: params.page }; }'),

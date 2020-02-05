@@ -4,7 +4,8 @@ use yii\widgets\Pjax;
 use yii\helpers\Url;
 use yii\helpers\Html;
 use yii\web\JsExpression;
-use ant\helpers\StringHelper;
+use ant\helpers\StringHelper as Str;
+use ant\helpers\ArrayHelper as Arr;
 
 $this->title = 'Borrow Book';
 
@@ -53,7 +54,7 @@ $userIc = isset($model->user) ? $model->user->getIdentityId()->andWhere(['type' 
                                 [
                                     'format' => 'html',
                                     'label' => 'Borrowed Book',
-                                    'value' => '<ul>'.StringHelper::forEach($model->getBookBorrowedInfo(), function($row) {
+                                    'value' => '<ul>'.Arr::implode('', $model->getBookBorrowedInfo(), function($row) {
                                         return '<li>'.$row.'</li>';
                                     }).'</ul>',
                                 ],

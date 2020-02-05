@@ -3,6 +3,7 @@ use yii\helpers\Html;
 use yii\widgets\ActiveForm;
 
 $validUntil = new DateTime();
+$status = Yii::$app->request->get('status');
 ?>
 
 <?php $form = ActiveForm::begin(['method' => 'get', 'action' => ['sticker']]) ?>
@@ -20,6 +21,8 @@ $validUntil = new DateTime();
 		],
 		//'options' => ['data' => ['method' => 'get']],
 	]) ?>
+	
+	<?= Html::hiddenInput('status', $status) ?>
 	
 	<?= Html::submitButton('Print', ['class' => 'btn btn-primary']) ?>
 <?php ActiveForm::end() ?>

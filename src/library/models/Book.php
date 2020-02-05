@@ -86,6 +86,7 @@ class Book extends \yii\db\ActiveRecord
     {
         return [
             [['title'], 'required'],
+            [['title'], 'unique'],
             [['title', 'small_title'], 'ant\validators\ChineseStringValidator'],
             [['newCopyQuantity'], 'integer', 'min' => 0],
             [['created_by', 'updated_by'], 'integer'],
@@ -138,20 +139,22 @@ class Book extends \yii\db\ActiveRecord
 				if (isset($code)) return [$code->category_id];
 				
 				// Title
-				$value = (new \SteelyWing\Chinese\Chinese)->to(\SteelyWing\Chinese\Chinese::CHS, $value);
-				$category = \ant\category\models\Category::ensureByTitle($value, 'book');
-				return [$category->id];
+				if ($value != '') {
+					$value = (new \SteelyWing\Chinese\Chinese)->to(\SteelyWing\Chinese\Chinese::CHS, $value);
+					$category = \ant\category\models\Category::ensureByTitle($value, 'book');
+					return [$category->id];
+				}
 			},
 			'book.category_code',
 			'book.language' => function($value) {
 				$value = (new \SteelyWing\Chinese\Chinese)->to(\SteelyWing\Chinese\Chinese::CHS, $value);
 				$nonChineseValue = strtoupper($value);
 				
-				if (in_array($value, ['中文', '华文', '华']) || in_array($nonChineseValue, ['CHINESE', 'CHI', 'C'])) {
+				if (in_array($value, ['中文', '华文', '华语', '华']) || in_array($nonChineseValue, ['CHINESE', 'CHI', 'C', 'BAHASA CINA'])) {
 					return \ant\library\models\Book::LANGUAGE_CHINESE;
-				} else if (in_array($value, ['英文', '英']) || in_array($nonChineseValue, ['ENGLISH', 'ENG', 'E'])) {
+				} else if (in_array($value, ['英文', '英语', '英']) || in_array($nonChineseValue, ['ENGLISH', 'ENG', 'E', 'BI', 'BAHASA INGGERIS'])) {
 					return \ant\library\models\Book::LANGUAGE_ENGLISH;
-				} else if (in_array($value, ['马来文', '国文', '国']) || in_array($nonChineseValue, ['MALAY', 'M', 'BAHASA MELAYU'])) {
+				} else if (in_array($value, ['马来文', '国文', '马来语', '国语', '国', '巫', '巫文']) || in_array($nonChineseValue, ['MALAY', 'M', 'MELAYU', 'BM', 'BAHASA MELAYU'])) {
 					return \ant\library\models\Book::LANGUAGE_MALAY;
 				}
 			},

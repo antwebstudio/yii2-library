@@ -1,6 +1,10 @@
 <?php
 use yii\helpers\Url;
 use yii\widgets\ListView;
+
+$this->context->layout = '//_clear';
+
+\project\themes\kongsi\assets\PrintPageAsset::register($this);
 ?>
 <style>
     .stickers .sticker { 
@@ -8,14 +12,21 @@ use yii\widgets\ListView;
 		/*background: url('/yellow.png');*/
 	}
     @media print {
-        .pagination, footer { display: none; }
+        .pagination, footer, .d-print-none { display: none; }
         .stickers .page-break {
             page-break-after:always;
             clear:both;
             margin: 0mm;
         }
+		.page-start {
+            clear:both;
+			/*margin-top: 10mm;*/
+		}
         body {
-            margin: 0mm;
+			margin-top: 0mm;
+			margin-bottom: 0mm;
+            margin-left: 10mm;
+			margin-right: 10mm;
 			/*background: url('/yellow.png');*/
         }
     }

@@ -4,6 +4,7 @@ namespace ant\library\backend\controllers;
 
 use Yii;
 use yii\data\ActiveDataProvider;
+use ant\helpers\DateTime;
 use ant\library\models\Book;
 use ant\library\models\BookCopy;
 use ant\library\models\BookCopySearch;
@@ -54,14 +55,17 @@ class BookCopyController extends \yii\web\Controller
 		
 		$query = BookCopy::find()->alias('bookCopy')->joinWith(['book' => function($q) { 
 				$q->alias('book')->joinWith('categories categories'); 
-			}])->orderBy('book.language, categories.id, bookCopy.id');
+			}])->orderBy('book.language, categories.id, bookCopy.id'); // order by bookCopy.id to make sure the sequence is always the same so that it wont print duplicated stickers
 				
-		if (isset($status)) {
-			$query->andWhere(['bookCopy.sticker_label_status' => BookCopy::STICKER_LABEL_NEED_REPRINT]);
+		if (isset($status) && $status) {
+			$query->andWhere(['bookCopy.sticker_label_status' => $status]);
 		}
 		
 		if (isset($date)) {
-			$query->andWhere(['between', 'bookCopy.created_at', $date[0], $date[1]]);
+			$startAt = new DateTime($date[0]);
+			$endAt = new DateTime($date[1]);
+			$endAt->setTimeAsEndOfDay();
+			$query->andWhere(['between', 'bookCopy.created_at', $startAt->systemFormat(), $endAt->systemFormat()]);
 		}
 		
         $dataProvider = new ActiveDataProvider([
