@@ -18,7 +18,6 @@ class BookBorrowed implements NotificationInterface {
         return \Yii::createObject([
            'class' => '\tuyakhov\notifications\messages\MailMessage',
            'subject' => 'Receipt for book borrowed',
-		   'from' => ['library@ruangkongsi.org' => \Yii::$app->name],
            'view' => ['html' => '@ant/library/mails/book-borrowed'],
            'viewData' => [
                'borrowedBooks' => $this->bookBorrowed,

@@ -14,6 +14,7 @@ class CreateUserForm extends \ant\web\FormModel {
 	const LIBRARY_MEMBER = 1;
 	const LIBRARY_SPECIAL_MEMBER = 2;
 
+	public $validSignupType = [self::TYPE_RK, self::TYPE_LIBRARY];
 	public $memberType;
 	public $agreeTnc;
 	public $agreeDeclaration;
@@ -146,7 +147,7 @@ class CreateUserForm extends \ant\web\FormModel {
 	}
 
 	public function init() {
-		if (!in_array($this->getSignupType(), [self::TYPE_RK, self::TYPE_LIBRARY])) {
+		if (!in_array($this->getSignupType(), $this->validSignupType)) {
 			throw new \Exception('Invalid signup type. ');
 		}
 	}

@@ -55,7 +55,7 @@ class MemberController extends \yii\web\Controller {
             if (isset($user)) {
                 $deposit = new DepositMoney;
                 $deposit->user_id = $id;
-                $invoice = $deposit->createInvoice($user, 100);
+                $invoice = $deposit->createInvoice($user, $user->getMembershipDepositAmount());
 
                 if (!$deposit->save()) throw new \Exception(print_r($deposit->errors, 1));
 

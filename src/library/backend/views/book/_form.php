@@ -12,7 +12,7 @@ use ant\library\models\BookPublisher;
 <div>
     <?php $form = ActiveForm::begin(); ?>
 
-    <?= $form->errorSummary($model); ?>
+    <?= $form->errorSummary($model, ['class' => 'alert alert-danger']); ?>
 
     <?= $form->field($model, 'isbn')->textInput(['maxlength' => true]) ?>
 
@@ -116,7 +116,7 @@ use ant\library\models\BookPublisher;
 	<?php $defaultOptions = ['暂时借用', '永久捐献'] ?>
 	
     <?= $form->field($model, 'adminUseTagsValue')->widget(\kartik\select2\Select2::className(), [
-        'data' => array_merge(array_combine($model->adminUseTagsValue, $model->adminUseTagsValue), array_combine($defaultOptions, $defaultOptions)),
+        'data' => array_merge(array_combine((array) $model->adminUseTagsValue, (array) $model->adminUseTagsValue), array_combine($defaultOptions, $defaultOptions)),
         'options' => ['placeholder' => 'Add a tag ...', 'multiple' => true],
 		
         'pluginOptions' => [

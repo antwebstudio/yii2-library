@@ -4,7 +4,7 @@ use yii\widgets\ListView;
 
 $this->context->layout = '//_clear';
 
-\project\themes\kongsi\assets\PrintPageAsset::register($this);
+\ant\library\assets\PrintPageAsset::register($this);
 ?>
 <style>
     .stickers .sticker { 

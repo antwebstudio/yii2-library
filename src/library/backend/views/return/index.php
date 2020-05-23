@@ -4,7 +4,7 @@ use yii\widgets\Pjax;
 use yii\helpers\Url;
 use yii\helpers\Html;
 use yii\web\JsExpression;
-use ant\helpers\StringHelper;
+use ant\helpers\ArrayHelper as Arr;
 use ant\library\models\BookBorrow;
 
 $this->title = 'Return Book';
@@ -48,7 +48,7 @@ $expiredBorrowDataProvider = new \yii\data\ActiveDataProvider([
 							[
 								'format' => 'html',
 								'label' => 'Borrowed Book',
-								'value' => '<ul>'.StringHelper::forEach($model->getBookBorrowedInfo(), function($row) {
+								'value' => '<ul>'.Arr::implode('', $model->getBookBorrowedInfo(), function($row) {
 									return '<li>'.$row.'</li>';
 								}).'</ul>',
 							],

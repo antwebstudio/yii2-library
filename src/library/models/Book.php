@@ -86,14 +86,15 @@ class Book extends \yii\db\ActiveRecord
     {
         return [
             [['title'], 'required'],
-            [['title'], 'unique'],
+            //[['title'], 'unique'],
+			[['isbn'], 'unique'],
+            [['title', 'isbn'], 'unique', 'targetAttribute' => ['title', 'isbn']],
             [['title', 'small_title'], 'ant\validators\ChineseStringValidator'],
             [['newCopyQuantity'], 'integer', 'min' => 0],
             [['created_by', 'updated_by'], 'integer'],
             [['publisher_id'], 'integer', 'enableClientValidation' => false],
             [['adminUseTagsValue', 'category_code', 'created_at', 'updated_at'], 'safe'],
             [['isbn'], 'string', 'max' => 20],
-            [['isbn'], 'unique'],
             [['title', 'small_title'], 'string', 'max' => 255],
             [['author_ids', 'category_ids'], 'each', 'rule' => ['integer']],
             [['language'], 'default', 'value'=> 0],
@@ -122,6 +123,18 @@ class Book extends \yii\db\ActiveRecord
 	public static function importerConfig() {
 		return [
 			'book.title', // Need to specify model name before attribute name
+			'book.isbn',
+			'book.publisher_id' => function($value) {
+				$value = (new \SteelyWing\Chinese\Chinese)->to(\SteelyWing\Chinese\Chinese::CHS, $value);
+				$publisher = \ant\library\models\BookPublisher::find()->andWhere(['name' => $value])->one();
+				
+				if (!isset($publisher)) {
+					$publisher = new \ant\library\models\BookPublisher;
+					$publisher->name = $value;
+					if (!$publisher->save()) throw new \Exception(print_r($publisher->errors, 1));
+				}
+				return $publisher->id;
+			},
 			'book.author_ids' => function($value) {
 				$value = (new \SteelyWing\Chinese\Chinese)->to(\SteelyWing\Chinese\Chinese::CHS, $value);
 				$author = \ant\library\models\BookAuthor::find()->andWhere(['name' => $value])->one();
@@ -142,6 +155,7 @@ class Book extends \yii\db\ActiveRecord
 				if ($value != '') {
 					$value = (new \SteelyWing\Chinese\Chinese)->to(\SteelyWing\Chinese\Chinese::CHS, $value);
 					$category = \ant\category\models\Category::ensureByTitle($value, 'book');
+					if (!isset($category)) throw new \Exception('Something is wrong');
 					return [$category->id];
 				}
 			},
@@ -238,8 +252,8 @@ class Book extends \yii\db\ActiveRecord
 			});
 	}
 
-    public function getShortCategoryCode() {
-		return isset($this->categoryCode[0]) ? $this->categoryCode[0]->udc : null;
+    public function getShortCategoryCode($type = 'udc') {
+		return isset($this->categoryCode[0]) ? $this->categoryCode[0]->{$type} : null;
         //return isset($this->category_code) && $this->category_code ? substr($this->category_code, 0, 3) : '000';
     }
 
