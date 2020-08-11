@@ -36,7 +36,7 @@ class BookSearch extends Book
     {
         return [
             [['id'/*, 'status', 'is_approved'*/], 'integer'],
-            [['category_ids', 'categories', 'title', 'isbn'], 'safe'],
+            [['category_ids', 'categories', 'title', 'isbn', 'publisher_id'], 'safe'],
         ];
     }
 
@@ -91,6 +91,7 @@ class BookSearch extends Book
         $query->andFilterWhere([
 			'book.id' => $this->id,
             'categories.id' => $this->category_ids,
+			'publisher_id' => $this->publisher_id,
         ]);
 
         $query->andFilterWhere(['like', 'book.title', (new Chinese)->to(Chinese::CHS, $this->title)])

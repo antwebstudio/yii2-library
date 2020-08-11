@@ -4,6 +4,7 @@ use yii\helpers\ArrayHelper;
 use kartik\select2\Select2;
 use ant\widgets\GridView;
 use ant\category\models\Category;
+use ant\library\models\BookPublisher;
 
 /* @var $this yii\web\View */
 $model = new \ant\library\models\Book;
@@ -89,7 +90,22 @@ $columns = [
 		},
 	],
 	'bookShelfCode',
-	'publisher_id',
+	[
+		'filter' => Select2::widget([
+			//'value' => $model,
+			//'name' => 'IncidentSearch[customer_id]',
+			'model' => $searchModel,
+			'attribute' => 'publisher_id',
+			'data' => ArrayHelper::map(BookPublisher::find()->all(), 'id', 'name'),
+			'size' => Select2::SMALL,
+			'options' => ['placeholder' => ''],
+			'pluginOptions' => [
+				'allowClear' => true
+			],
+		]),
+		'attribute' => 'publisher.name',
+		'label' => 'Publisher 出版社',
+	],
 	//'created_at',
 	//'created_by',
 	//'updated_at',

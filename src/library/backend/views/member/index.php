@@ -10,7 +10,16 @@ $this->title = 'Manage Members';
 	'columns' => [
 		'id',
 		'username',
-		'email',
+		[
+			'attribute' => 'email',
+			'label' => 'Email / Contact',
+			'format' => 'html',
+			'value' => function($model) {
+				$content = $model->email.'<br/>';
+				$content .= $model->profile->contact_number ?? '';
+				return $content;
+			},
+		],
 		[
 			'label' => 'IC Number',
             'format' => 'html',

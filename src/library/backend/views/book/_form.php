@@ -96,7 +96,7 @@ use ant\library\models\BookPublisher;
             'allowClear' => true,
             'minimumInputLength' => 1,
             'ajax' => [
-                'url' => Url::to(['/library/publisher/ajax-publishers']),
+                'url' => Url::to(['/library/backend/publisher/ajax-publishers']),
                 'dataType' => 'json',
                 'delay' => 250,
                 'data' => new JsExpression('function(params) { return {q:params.term, page: params.page}; }'),
