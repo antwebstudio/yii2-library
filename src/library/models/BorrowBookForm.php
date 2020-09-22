@@ -7,8 +7,8 @@ class BorrowBookForm extends \yii\base\Model {
     public $bookCopyId;
     public $userId;
     public $confirm;
-    public $borrowDays = 28;
-    public $bookLimitPerMember = 2;
+    public $borrowDays = 14;
+    public $bookLimitPerMember = 5;
 
 	protected $_bookBorrowed;
     protected $_bookCopy;

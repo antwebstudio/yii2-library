@@ -57,8 +57,8 @@ class BorrowController extends \yii\web\Controller {
 
     public function actionRenew($id = null) {
         $model = BookBorrow::findOne($id);
-        if ($model->renewCount < 2) {
-            $model->renew(14)->save();
+        if ($model->renewCount < 1) {
+            $model->renew(7)->save();
             $model->refresh();
 			
 			$notification = new \ant\library\notifications\BookBorrowed($model);
