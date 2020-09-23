@@ -3,6 +3,7 @@
 namespace ant\library\models;
 
 use Yii;
+use ant\category\models\Category;
 
 /**
  * This is the model class for table "ks_library_category_code".
