@@ -15,6 +15,9 @@ $userIc = isset($model->user) ? $model->user->getIdentityId()->andWhere(['type' 
 ?>
 
 <?php if ($showDetail): ?>
+    <div class="alert alert-info">
+        借书期限：<?= $model->borrowDays ?> 天 | 会员最多可借 <?= $model->bookLimitPerMember ?> 本书
+    </div>
     <div class="row">
         <div class="col-md-6">
             <div class="panel panel-default">
