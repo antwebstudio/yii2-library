@@ -87,7 +87,7 @@ class Book extends \yii\db\ActiveRecord
         return [
             [['title'], 'required'],
             //[['title'], 'unique'],
-			[['isbn'], 'unique'],
+			//[['isbn'], 'unique'],
             [['title', 'isbn'], 'unique', 'targetAttribute' => ['title', 'isbn']],
             [['title', 'small_title'], 'ant\validators\ChineseStringValidator'],
             [['newCopyQuantity'], 'integer', 'min' => 0],
@@ -203,19 +203,7 @@ class Book extends \yii\db\ActiveRecord
 	}
 
 	public function getCategories() {
-		$query = $this->hasMany(Category::className(), ['id' => 'category_id'])
-			->viaTable('{{%category_map}}', ['model_id' => 'id'], function ($query) {
-				$query->andWhere([
-				//'category_map.model_id' => $this->owner->id,
-				'{{%category_map}}.model_class_id' => \ant\models\ModelClass::getClassId((self::class))
-				]);
-			});
-			
-		if ($this->categoryType) {
-			$query->onCondition(['type' => $this->categoryType]);
-		}
-		
-		return $query;
+        return $this->getCategoriesRelation();
 	}
 
     /**
