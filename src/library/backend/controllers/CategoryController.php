@@ -11,6 +11,11 @@ use ant\library\models\CategoryCode;
 class CategoryController extends \yii\web\Controller {
     public function actionUpdate($id) {
         $model = CategoryCode::findOne(['category_id' => $id]);
+        if (!isset($model)) {
+            $model = new CategoryCode;
+            $model->category_id = $id;
+            if (!$model->save()) throw new \Exception(print_r($model->errors, 1));
+        }
 
         if ($model->load(Yii::$app->request->post()) && $model->save()) {
             Yii::$app->session->setFlash('success', 'Category updated successfully. ');
