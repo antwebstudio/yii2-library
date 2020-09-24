@@ -30,6 +30,7 @@ $columns = [
 			$category = $model->getCategories()->one();
 			return isset($category) ? $category->title : null;
 		},
+		'headerOptions' => ['style' => 'min-width: 100px'],
 		'filter' => Select2::widget([
 			//'value' => $model,
 			//'name' => 'IncidentSearch[customer_id]',
