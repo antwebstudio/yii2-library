@@ -148,7 +148,7 @@ class Book extends \yii\db\ActiveRecord
 			},
 			'book.category_ids' => function($value) {
 				// Category Code
-				$code = \ant\library\models\CategoryCode::findOne(['udc' => $value]);
+				$code = \ant\library\models\CategoryCode::findOne(['dewey_tw' => $value]);
 				if (isset($code)) return [$code->category_id];
 				
 				// Title
