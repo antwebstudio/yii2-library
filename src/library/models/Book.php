@@ -203,7 +203,7 @@ class Book extends \yii\db\ActiveRecord
 	}
 
 	public function getCategories() {
-        return $this->getCategoriesRelation();
+        return $this->getCategoriesRelation(self::CATEGORY_TYPE);
 	}
 
     /**
