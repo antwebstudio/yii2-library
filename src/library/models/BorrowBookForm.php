@@ -7,8 +7,8 @@ class BorrowBookForm extends \yii\base\Model {
     public $bookCopyId;
     public $userId;
     public $confirm;
-    public $borrowDays = 14;
-    public $bookLimitPerMember = 5;
+    public $borrowDays;
+    public $bookLimitPerMember;
 
 	protected $_bookBorrowed;
     protected $_bookCopy;
@@ -31,6 +31,9 @@ class BorrowBookForm extends \yii\base\Model {
             [['bookCopyId'], 'ant\library\validators\BookAvailableValidator'],
             [['userId'], 'ant\member\validators\MembershipValidator'],
             [['userId'], 'validateLimitOfBorrowPerMember', 'message' => 'Exceed limit of books can be borrowed by this member. '],
+            [['userId'], '\ant\library\validators\DepositMoneyValidator', 'when' => function() {
+                return $this->getTotalDepositAmountNeeded() > 0;
+            }],
             //[['publisher_id'], 'exist', 'skipOnError' => true, 'targetClass' => BookPublisher::className(), 'targetAttribute' => ['publisher_id' => 'id']],
         ]);
     }
@@ -55,6 +58,51 @@ class BorrowBookForm extends \yii\base\Model {
 
             return true;
         }
+    }
+
+    protected function getMemberTypePackageItem() {
+        $memberType = $this->getUserMemberType();
+        if (isset($memberType)) {
+            return $memberType->packageItems[0];
+        }
+    }
+
+    protected function getUserMemberType() {
+        if (isset($this->_user)) {
+            $subscription = \ant\subscription\models\Subscription::find()->currentlyActiveForUser($this->_user->id)
+                ->type('member')
+                ->isPaid()
+                ->orderBy('expire_at DESC')
+                ->one();
+        }
+
+        return isset($subscription) ? $subscription->package : null;
+    }
+
+    public function getBookLimit() {
+        $subscriptionItem = $this->getMemberTypePackageItem();
+        if (isset($subscriptionItem->book_limit)) {
+            return $subscriptionItem->book_limit;
+        }
+        return $this->bookLimitPerMember;
+    }
+
+    public function getTotalDepositAmountNeeded() {
+        $subscriptionItem = $this->getMemberTypePackageItem();
+        return $subscriptionItem->options['depositAmount'] ?? 0;
+    }
+
+    public function getMemberTypeName() {
+        $memberType = $this->getUserMemberType();
+        return isset($memberType) ? $memberType->name : '';
+    }
+
+    public function getBookBorrowDays() {
+        $subscriptionItem = $this->getMemberTypePackageItem();
+        if (isset($subscriptionItem->book_limit) && $subscriptionItem->book_limit) {
+           return $subscriptionItem->content_valid_period; 
+        }
+        return $this->borrowDays;
     }
 
     public function getBookCopy() {

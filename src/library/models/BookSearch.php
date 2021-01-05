@@ -72,7 +72,10 @@ class BookSearch extends Book
     public function search($params)
     {
         $query = Book::find()->alias('book');
-		$query->joinWith('categories categories');
+        // Note: temporarily disable to avoid super slow when categories is alot.
+        if (\ant\category\models\Category::find()->count() <= 200) {
+			$query->joinWith('categories categories');
+		}
         
         // add conditions that should always apply here
         $this->load($params);

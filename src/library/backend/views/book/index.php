@@ -31,7 +31,7 @@ $columns = [
 			return isset($category) ? $category->title : null;
 		},
 		'headerOptions' => ['style' => 'min-width: 100px'],
-		'filter' => Select2::widget([
+		'filter' => Category::find()->count() > 200 ? null : Select2::widget([
 			//'value' => $model,
 			//'name' => 'IncidentSearch[customer_id]',
 			'model' => $searchModel,
@@ -92,7 +92,7 @@ $columns = [
 	],
 	'bookShelfCode',
 	[
-		'filter' => Select2::widget([
+		'filter' => BookPublisher::find()->count() > 100 ? null : Select2::widget([
 			//'value' => $model,
 			//'name' => 'IncidentSearch[customer_id]',
 			'model' => $searchModel,
