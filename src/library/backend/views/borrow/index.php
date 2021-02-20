@@ -6,6 +6,7 @@ use yii\helpers\Html;
 use yii\web\JsExpression;
 use ant\helpers\StringHelper as Str;
 use ant\helpers\ArrayHelper as Arr;
+use ant\library\models\BorrowBookForm;
 
 $this->title = 'Borrow Book';
 
@@ -27,7 +28,7 @@ $userIc = isset($model->user) ? $model->user->getIdentityId()->andWhere(['type' 
                         <?= \yii\widgets\DetailView::widget([
                             'model' => $model->bookCopy->book,
                             'attributes' => [
-                                'id',
+                                // 'bookCopy.reference',
                                 'title',
                                 'languageText',
                             ],
@@ -70,6 +71,7 @@ $userIc = isset($model->user) ? $model->user->getIdentityId()->andWhere(['type' 
     </div>
 
     <?php $form = ActiveForm::begin() ?>
+        <?= $form->field($model, 'customBarcode')->hiddenInput()->label(false) ?>
         <?= $form->field($model, 'bookCopyId')->hiddenInput()->label(false) ?>
         <?= $form->field($model, 'userId')->hiddenInput()->label(false) ?>
         <?= $form->field($model, 'confirm')->hiddenInput(['value' => 1])->label(false) ?>
@@ -80,7 +82,11 @@ $userIc = isset($model->user) ? $model->user->getIdentityId()->andWhere(['type' 
 <?php else: ?>
 
     <?php $form = ActiveForm::begin() ?>
-        <?= $form->field($model, 'bookCopyId')->textInput() ?>
+        <?php if ($model->scenario == BorrowBookForm::SCENARIO_CUSTOM_BARCODE): ?>
+            <?= $form->field($model, 'customBarcode')->textInput() ?>
+        <?php else: ?>
+            <?= $form->field($model, 'bookCopyId')->textInput() ?>
+        <?php endif ?>
         
         <?= $form->field($model, 'userId')->widget(\kartik\select2\Select2::className(), [
             //'data' => ArrayHelper::map(BookPublisher::find()->andWhere(['id' => $model->publisher_id])->asArray()->all(), 'id', 'name'),

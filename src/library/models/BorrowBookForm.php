@@ -4,11 +4,14 @@ namespace ant\library\models;
 use ant\user\models\User;
 
 class BorrowBookForm extends \yii\base\Model {
+    const SCENARIO_CUSTOM_BARCODE = 'custom_barcode';
+
     public $bookCopyId;
     public $userId;
     public $confirm;
-    public $borrowDays = 28;
-    public $bookLimitPerMember = 2;
+    public $borrowDays;
+    public $bookLimitPerMember;
+    public $customBarcode;
 
 	protected $_bookBorrowed;
     protected $_bookCopy;
@@ -26,18 +29,23 @@ class BorrowBookForm extends \yii\base\Model {
         return $this->getCombinedRules([
             [['bookCopyId'], 'exist', 'skipOnError' => true, 'targetClass' => BookCopy::className(), 'targetAttribute' => ['bookCopyId' => 'id']],
             [['bookCopyId', 'userId'], 'number'],
-            [['bookCopyId', 'userId'], 'required'],
+            [['bookCopyId'], 'required', 'except' => self::SCENARIO_CUSTOM_BARCODE],
+            [['customBarcode'], 'required', 'on' => self::SCENARIO_CUSTOM_BARCODE],
+            [['userId'], 'required'],
             [['confirm'], 'safe'],
             [['bookCopyId'], 'ant\library\validators\BookAvailableValidator'],
             [['userId'], 'ant\member\validators\MembershipValidator'],
             [['userId'], 'validateLimitOfBorrowPerMember', 'message' => 'Exceed limit of books can be borrowed by this member. '],
+            [['userId'], '\ant\library\validators\DepositMoneyValidator', 'when' => function() {
+                return $this->getTotalDepositAmountNeeded() > 0;
+            }],
             //[['publisher_id'], 'exist', 'skipOnError' => true, 'targetClass' => BookPublisher::className(), 'targetAttribute' => ['publisher_id' => 'id']],
         ]);
     }
 
     public function validateLimitOfBorrowPerMember($attribute, $params, $validator) {
         $infos = $this->getBookBorrowedInfo();
-        if (count($infos) >= $this->bookLimitPerMember) {
+        if (count($infos) >= $this->bookLimit) {
             $this->addError($attribute, $validator->message);
         }
     }
@@ -45,7 +53,7 @@ class BorrowBookForm extends \yii\base\Model {
     public function save() {
         if ($this->validate()) {
             $model = new BookBorrow;
-            $model->book_copy_id = $this->bookCopyId;
+            $model->book_copy_id = $this->bookCopy->id;
             $model->user_id = $this->userId;
             $model->borrow_days = $this->borrowDays;
 
@@ -57,9 +65,58 @@ class BorrowBookForm extends \yii\base\Model {
         }
     }
 
+    protected function getMemberTypePackageItem() {
+        $memberType = $this->getUserMemberType();
+        if (isset($memberType)) {
+            return $memberType->packageItems[0];
+        }
+    }
+
+    protected function getUserMemberType() {
+        if (isset($this->_user)) {
+            $subscription = \ant\subscription\models\Subscription::find()->currentlyActiveForUser($this->_user->id)
+                ->type('member')
+                ->isPaid()
+                ->orderBy('expire_at DESC')
+                ->one();
+        }
+
+        return isset($subscription) ? $subscription->package : null;
+    }
+
+    public function getBookLimit() {
+        $subscriptionItem = $this->getMemberTypePackageItem();
+        if (isset($subscriptionItem->book_limit)) {
+            return $subscriptionItem->book_limit;
+        }
+        return $this->bookLimitPerMember;
+    }
+
+    public function getTotalDepositAmountNeeded() {
+        $subscriptionItem = $this->getMemberTypePackageItem();
+        return $subscriptionItem->options['depositAmount'] ?? 0;
+    }
+
+    public function getMemberTypeName() {
+        $memberType = $this->getUserMemberType();
+        return isset($memberType) ? $memberType->name : '';
+    }
+
+    public function getBookBorrowDays() {
+        $subscriptionItem = $this->getMemberTypePackageItem();
+        if (isset($subscriptionItem->book_limit) && $subscriptionItem->book_limit) {
+           return $subscriptionItem->content_valid_period; 
+        }
+        return $this->borrowDays;
+    }
+
     public function getBookCopy() {
         if (!isset($this->_bookCopy)) {
-            $this->_bookCopy = BookCopy::findOne($this->bookCopyId);
+            if ($this->scenario == self::SCENARIO_CUSTOM_BARCODE) {
+                $this->_bookCopy = BookCopy::find()->andWhere(['custom_barcode' => $this->customBarcode])->one();
+            } else {
+                $this->_bookCopy = BookCopy::findOne($this->bookCopyId);
+            }
         }
         return $this->_bookCopy;
     }
