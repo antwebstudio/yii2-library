@@ -23,6 +23,8 @@ use ant\user\models\User;
  */
 class BookBorrow extends \yii\db\ActiveRecord
 {
+    const STATUS_RESERVED = 9;
+
     /**
      * {@inheritdoc}
      */
@@ -116,5 +118,13 @@ class BookBorrow extends \yii\db\ActiveRecord
 
     public function renew($days) {
         return $this->extendExpiryDate($days);
+    }
+
+    public function getIsReturned() {
+
+    }
+
+    public function getIsReserved() {
+        return $this->status == BookBorrow::STATUS_RESERVED;
     }
 }

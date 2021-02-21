@@ -17,7 +17,7 @@ Please reply to this email to renew</p>
 			<th style="padding: 3px 5px; text-align: left">Barcode</th>
 			<th style="padding: 3px 5px; text-align: left">Book Title</th>
 			<th style="padding: 3px 5px; text-align: left">Expire Date</th>
-			<th style="padding: 3px 5px; text-align: left">Renewed (max 2)</th>
+			<th style="padding: 3px 5px; text-align: left">Renewed (max <?= $maximumRenew ?>)</th>
 		</tr>
 	</thead>
 	<tbody>

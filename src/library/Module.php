@@ -7,6 +7,10 @@ namespace ant\library;
  */
 class Module extends \yii\base\Module
 {
+    public $barcode;
+
+    public $category;
+    
     /**
      * @inheritdoc
      */
@@ -15,5 +19,9 @@ class Module extends \yii\base\Module
         parent::init();
 
         // custom initialization code goes here
+    }
+
+    public function getPolicy($user) {
+        return \ant\library\models\LibraryPolicy::for($user);
     }
 }

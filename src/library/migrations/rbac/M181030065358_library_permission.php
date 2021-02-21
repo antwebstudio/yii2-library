@@ -38,6 +38,7 @@ class M181030065358_library_permission extends Migration
 			],
 			\ant\library\backend\controllers\BookCopyController::class => [
                 'index' => ['View book copies list', [Role::ROLE_ADMIN]],
+                'update' => ['View book copies list', [Role::ROLE_ADMIN]],
                 'print-sticker' => ['Print book copies sticker', [Role::ROLE_ADMIN]],
                 'sticker' => ['Print book copies sticker', [Role::ROLE_ADMIN]],
                 'ajax-list' => ['Get book copies list by ajax', [Role::ROLE_ADMIN]],
@@ -47,6 +48,8 @@ class M181030065358_library_permission extends Migration
 			\ant\library\backend\controllers\BorrowController::class => [
                 'index' => ['Borrow a book', [Role::ROLE_ADMIN]],
 				'renew' => ['Renew a book', [Role::ROLE_ADMIN]],
+				'cancel-reserve' => ['Reserve a book', [Role::ROLE_ADMIN]],
+				'reserve' => ['Reserve a book', [Role::ROLE_ADMIN]],
 				'borrowed' => ['List all book borrowed', [Role::ROLE_ADMIN]],
                 'ajax-users' => ['Search a user by ajax', [Role::ROLE_ADMIN]],
 			],

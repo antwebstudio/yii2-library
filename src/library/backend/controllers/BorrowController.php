@@ -5,6 +5,7 @@ use Yii;
 use ant\user\models\User;
 use ant\library\models\BookBorrow;
 use ant\library\models\BookBorrowSearch;
+use ant\library\models\BookCopy;
 use ant\library\models\BorrowBookForm;
 
 class BorrowController extends \yii\web\Controller {
@@ -21,14 +22,23 @@ class BorrowController extends \yii\web\Controller {
 
     public function actionIndex() {
         $model = $this->module->getFormModel('borrowBook');
+        if (BookCopy::barcodeAttribute() == 'custom_barcode') {
+            $model->scenario = $model::SCENARIO_CUSTOM_BARCODE;
+        }
 
         if ($model->load(Yii::$app->request->post()) && $model->confirm && $model->save()) {
-			Yii::$app->session->setFlash('library', 'Book borrow is successfully recorded. ');
 			
-			$model->refresh();
+            if ($model->reserve) {
+                Yii::$app->session->setFlash('library', 'Book copy is successfully reserved. ');
 			
-			$notification = new \ant\library\notifications\BookBorrowed($model->bookBorrowedRecords);
-			Yii::$app->notifier->send($model->user, $notification);
+            } else {
+                Yii::$app->session->setFlash('library', 'Book borrow is successfully recorded. ');
+			
+			    $model->refresh();
+			
+                $notification = new \ant\library\notifications\BookBorrowed($model->bookBorrowedRecords, $model->user);
+                Yii::$app->notifier->send($model->user, $notification);
+            }
 			
 			return $this->redirect(['/library/backend/borrow/borrowed', 'user' => $model->user->id]);
         }
@@ -55,13 +65,28 @@ class BorrowController extends \yii\web\Controller {
         ]);
     }
 
+    public function actionCancelReserve($id) {
+        $model = BookBorrow::findOne($id);
+        if ($model->isReserved && $model->delete()) {
+            Yii::$app->session->setFlash('success', 'Reservation is successfully canceled. ');
+            return $this->goBack(Yii::$app->request->referrer);
+        }
+    }
+
     public function actionRenew($id = null) {
         $model = BookBorrow::findOne($id);
-        if ($model->renewCount < 2) {
-            $model->renew(14)->save();
+        $policy = Yii::$app->getModule('library')->getPolicy($model->user);
+
+        if ($policy->getRenewDays() <= 0) {
+            Yii::$app->session->setFlash('error', 'This member is not allowed to renew book.');
+            return $this->goBack(Yii::$app->request->referrer);
+        }
+
+        if ($model->renewCount < $policy->getMaxRenew()) {
+            $model->renew($policy->getRenewDays())->save();
             $model->refresh();
 			
-			$notification = new \ant\library\notifications\BookBorrowed($model);
+			$notification = new \ant\library\notifications\BookBorrowed($model, $model->user);
 			Yii::$app->notifier->send($model->user, $notification);
 
             Yii::$app->session->setFlash('success', 'Successfully renewed, new expiry date: '.$model->expireAt);
@@ -69,7 +94,6 @@ class BorrowController extends \yii\web\Controller {
             return $this->goBack(Yii::$app->request->referrer);
         } else {
             Yii::$app->session->setFlash('error', 'Exceed limit of renew.');
-
             return $this->goBack(Yii::$app->request->referrer);
         }
     }

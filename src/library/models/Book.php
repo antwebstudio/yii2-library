@@ -148,7 +148,7 @@ class Book extends \yii\db\ActiveRecord
 			},
 			'book.category_ids' => function($value) {
 				// Category Code
-				$code = \ant\library\models\CategoryCode::findOne(['udc' => $value]);
+				$code = \ant\library\models\CategoryCode::findOne([self::categoryCodeSystem() => $value]);
 				if (isset($code)) return [$code->category_id];
 				
 				// Title
@@ -177,6 +177,11 @@ class Book extends \yii\db\ActiveRecord
 			}
 		];
 	}
+
+    public static function categoryCodeSystem() {
+        $module = Yii::$app->getModule('library');
+        return $type ?? ($module->category['code_system'] ?? 'udc');
+    }
 	
 	public function getLanguageText() {
 		switch ($this->language) {
@@ -240,7 +245,9 @@ class Book extends \yii\db\ActiveRecord
 			});
 	}
 
-    public function getShortCategoryCode($type = 'udc') {
+    public function getShortCategoryCode($type = null) {
+        $type = $type ?? self::categoryCodeSystem();
+        
 		return isset($this->categoryCode[0]) ? $this->categoryCode[0]->{$type} : null;
         //return isset($this->category_code) && $this->category_code ? substr($this->category_code, 0, 3) : '000';
     }

@@ -42,6 +42,19 @@ class BookCopyController extends \yii\web\Controller
             'dataProvider' => $dataProvider,
         ]);
     }
+
+    public function actionUpdate($id) {
+        $model = BookCopy::findOrFail($id);
+
+        if ($model->load(Yii::$app->request->post()) && $model->save()) {
+            Yii::$app->session->setFlash('success', 'Book copy updated successfully.');
+            $this->redirect(['index']);
+        }
+
+        return $this->render($this->action->id, [
+			'model' => $model,
+        ]);
+    }
 	
 	public function actionPrintSticker() {
 		return $this->render($this->action->id, [
@@ -79,6 +92,7 @@ class BookCopyController extends \yii\web\Controller
         return $this->render($this->action->id, [
             'dataProvider' => $dataProvider,
 			'stickerPerPage' => $stickerPerPage,
+            'barcodeType' => BookCopy::barcodeType(),
         ]);
     }
 

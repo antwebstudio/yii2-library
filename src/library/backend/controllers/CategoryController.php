@@ -19,7 +19,7 @@ class CategoryController extends \yii\web\Controller {
 
         if ($model->load(Yii::$app->request->post()) && $model->save()) {
             Yii::$app->session->setFlash('success', 'Category updated successfully. ');
-            return $this->redirect(['/category/backend', 'type' => $model->category->type->name]);
+            return $this->redirect(['/category/backend', 'type' => $model->category->type->name ?? null]);
         }
 
         return $this->render($this->action->id, [

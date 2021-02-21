@@ -1,16 +1,11 @@
 <?php
 use yii\helpers\Url;
 use ant\widgets\Nav;
-
-$bookCopyId = Yii::$app->request->get('copy');
-$backUrl = isset($bookCopyId) ? ['/library/backend/book-copy'] : ['/library/backend/book'];
 ?>
-
 <?php $this->beginBlock('actions') ?>
-    <a class="btn btn-dark float-right" href="<?= Url::to($backUrl) ?>">Back</a>
+    <a class="btn btn-dark float-right" href="<?= Url::to(['/library/backend/book-copy']) ?>">Back</a>
 <?php $this->endBlock('actions') ?>
 
-<?php if(isset($bookCopyId)): ?>
 <?= Nav::widget([
     'options' => [
         'class' => 'nav-tabs',
@@ -20,16 +15,14 @@ $backUrl = isset($bookCopyId) ? ['/library/backend/book-copy'] : ['/library/back
     'items' => [
         [
             'label' => 'Book Copy',
-            'url' => Url::to(['/library/backend/book-copy/update', 'id' => $bookCopyId]),
+            'url' => Url::current(),
+            'active' => true,
         ],
         [
             'label' => 'Book Information',
-            'active' => true,
+            'url' => Url::to(['/library/backend/book/update', 'id' => $model->book->id, 'copy' => $model->id]),
         ],
     ],
 ]) ?>
-<?php endif ?>
 
-<?php echo $this->render('_form', [
-    'model' => $model,
-]) ?>
+<?= $this->render('_form', ['model' => $model]) ?>

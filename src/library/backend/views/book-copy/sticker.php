@@ -44,6 +44,9 @@ $this->context->layout = '//_clear';
         'dataProvider' => $dataProvider,
         'itemView' => '_sticker',
         'layout' => '{pager} {items}',
-		'viewParams' => ['stickerPerPage' => $stickerPerPage],
+		'viewParams' => [
+            'stickerPerPage' => $stickerPerPage,
+            'barcodeType' => $barcodeType,
+        ],
     ]) ?>
 </div>

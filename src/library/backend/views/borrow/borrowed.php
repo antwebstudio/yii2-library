@@ -1,31 +1,46 @@
 <?php
 use yii\helpers\Html;
 use yii\helpers\Url;
+use ant\library\models\BookBorrow;
+
+$this->title = 'Record of borrow';
 
 $tabQueryParamName = 'tab';
 $tab = Yii::$app->request->get($tabQueryParamName);
+if (isset($user)) {
+    $this->title = $this->title.' - '.$user->username;
+
+    $libraryPolicy = Yii::$app->getModule('library')->getPolicy($user);
+    $userIc = $user->getIdentityId()->andWhere(['type' => 'ic'])->one();
+}
 
 if ($tab == 'expired') {
-    $dataProvider->query->notReturned()->expired();
+    $dataProvider->query->notReturned()->expired()->excludeReserved();
 } elseif ($tab == 'not-expired') {
-    $dataProvider->query->notReturned()->notExpired();
+    $dataProvider->query->notReturned()->notExpired()->excludeReserved();
 } elseif ($tab == 'returned') {
     $dataProvider->query->returned();
+} elseif ($tab == 'reserved') {
+    $dataProvider->query->reserved();
 } else {
-	$dataProvider->query->notReturned();
+	$dataProvider->query->notReturned()->excludeReserved();
 }
 ?>
 
 <?php if (isset($user)): ?>
-	<?php $userIc = $user->getIdentityId()->andWhere(['type' => 'ic'])->one() ?>
-	<div class="well">
+    <?php $this->beginBlock('header') ?>
+	<div class="card card-body mb-3">
 		<div>
 			<div>Username: <?= $user->username ?></div>
 			<div>Email: <?= $user->email ?></div>
 			<div>Name: <?= $user->fullName ?></div>
 			<div>IC: <?= isset($userIc) ? $userIc->value : '' ?></div>
+            <div>Member Type: <?= $libraryPolicy->getMemberTypeName() ?></div>
+            <div>Member Status: <span class="badge badge-<?= $user->isMember ? 'success' : 'warning' ?>"><?= $user->membershipStatusText ?></span></div>
+            <div>Book Renew Days: <?= $libraryPolicy->getRenewDays() ?></div>
 		</div>
 	</div>
+    <?php $this->endBlock() ?>
 <?php endif ?>
 
 <?= \ant\widgets\Tabs::widget([
@@ -48,6 +63,11 @@ if ($tab == 'expired') {
             'label' => 'Returned',
             'url' => Url::current([$tabQueryParamName => 'returned']),
             'active' => $tab == 'returned' ? true : false,
+        ],
+        [
+            'label' => 'Reserved',
+            'url' => Url::current([$tabQueryParamName => 'reserved']),
+            'active' => $tab == 'reserved' ? true : false,
         ],
     ],
 ]) ?>
@@ -86,10 +106,18 @@ if ($tab == 'expired') {
         'createdBy.username',
         [
             'class' => 'yii\grid\ActionColumn',
-            'template' => '{renew}',
+            'template' => '{renew} {cancel-reserve}',
             'buttons' => [
                 'renew' => function($url, $model, $key) {
-                    return Html::a('Renew', ['/library/backend/borrow/renew', 'id' => $model->id], ['data-method' => 'post', 'class' => 'btn btn-default']);
+                    if (!$model->isReserved) {
+                        return Html::a('Renew', ['/library/backend/borrow/renew', 'id' => $model->id], ['data-confirm' => 'Are you sure you want to renew?', 'data-method' => 'post', 'class' => 'btn btn-default'])
+                            .'(Renewed: '.$model->renewCount.')';
+                    }
+                },
+                'cancel-reserve' => function($url, $model, $key) {
+                    if ($model->isReserved) {
+                        return Html::a('Cancel Reserve', ['/library/backend/borrow/cancel-reserve', 'id' => $model->id], ['data-method' => 'post', 'class' => 'btn btn-default']);
+                    }
                 }
             ],
         ],

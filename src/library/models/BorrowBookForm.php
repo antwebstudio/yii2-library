@@ -1,21 +1,24 @@
 <?php
 namespace ant\library\models;
 
+use Yii;
 use ant\user\models\User;
 
 class BorrowBookForm extends \yii\base\Model {
     const SCENARIO_CUSTOM_BARCODE = 'custom_barcode';
-
     public $bookCopyId;
     public $userId;
     public $confirm;
     public $borrowDays;
     public $bookLimitPerMember;
     public $customBarcode;
+    public $reserve = false;
 
 	protected $_bookBorrowed;
+    protected $_bookReserved;
     protected $_bookCopy;
     protected $_user;
+    protected $_libraryPolicy;
 	
 	public function behaviors() {
 		return [
@@ -32,8 +35,10 @@ class BorrowBookForm extends \yii\base\Model {
             [['bookCopyId'], 'required', 'except' => self::SCENARIO_CUSTOM_BARCODE],
             [['customBarcode'], 'required', 'on' => self::SCENARIO_CUSTOM_BARCODE],
             [['userId'], 'required'],
-            [['confirm'], 'safe'],
-            [['bookCopyId'], 'ant\library\validators\BookAvailableValidator'],
+            [['confirm', 'reserve'], 'safe'],
+            [['bookCopyId'], 'ant\library\validators\BookAvailableValidator', 'when' => function() {
+                return !$this->reserve;
+            }],
             [['userId'], 'ant\member\validators\MembershipValidator'],
             [['userId'], 'validateLimitOfBorrowPerMember', 'message' => 'Exceed limit of books can be borrowed by this member. '],
             [['userId'], '\ant\library\validators\DepositMoneyValidator', 'when' => function() {
@@ -45,69 +50,44 @@ class BorrowBookForm extends \yii\base\Model {
 
     public function validateLimitOfBorrowPerMember($attribute, $params, $validator) {
         $infos = $this->getBookBorrowedInfo();
-        if (count($infos) >= $this->bookLimit) {
+        if (count($infos) >= $this->getBookLimit()) {
             $this->addError($attribute, $validator->message);
         }
     }
 
     public function save() {
         if ($this->validate()) {
-            $model = new BookBorrow;
-            $model->book_copy_id = $this->bookCopy->id;
-            $model->user_id = $this->userId;
-            $model->borrow_days = $this->borrowDays;
-
-            $model->expireAfterDays($this->borrowDays, true);
-
-            if (!$model->save()) throw new \Exception(print_r($model->errors, 1));
+            if ($this->reserve) {
+                $this->bookCopy->reserveBy($this->userId, $this->getBookBorrowDays());
+            } else {
+                $this->bookCopy->lendTo($this->userId, $this->getBookBorrowDays());
+            }   
 
             return true;
         }
     }
 
-    protected function getMemberTypePackageItem() {
-        $memberType = $this->getUserMemberType();
-        if (isset($memberType)) {
-            return $memberType->packageItems[0];
+    protected function getLibraryPolicy() {
+        if (!isset($this->_libraryPolicy)) {
+            $this->_libraryPolicy = Yii::$app->getModule('library')->getPolicy($this->user);
         }
-    }
-
-    protected function getUserMemberType() {
-        if (isset($this->_user)) {
-            $subscription = \ant\subscription\models\Subscription::find()->currentlyActiveForUser($this->_user->id)
-                ->type('member')
-                ->isPaid()
-                ->orderBy('expire_at DESC')
-                ->one();
-        }
-
-        return isset($subscription) ? $subscription->package : null;
+        return $this->_libraryPolicy;
     }
 
     public function getBookLimit() {
-        $subscriptionItem = $this->getMemberTypePackageItem();
-        if (isset($subscriptionItem->book_limit)) {
-            return $subscriptionItem->book_limit;
-        }
-        return $this->bookLimitPerMember;
+        return $this->libraryPolicy->getMaxBorrow() ?? $this->bookLimitPerMember;
     }
 
     public function getTotalDepositAmountNeeded() {
-        $subscriptionItem = $this->getMemberTypePackageItem();
-        return $subscriptionItem->options['depositAmount'] ?? 0;
+        return $this->libraryPolicy->getDepositNeeded() ?? null;
     }
 
     public function getMemberTypeName() {
-        $memberType = $this->getUserMemberType();
-        return isset($memberType) ? $memberType->name : '';
+        return $this->libraryPolicy->getMemberTypeName() ?? null;
     }
 
     public function getBookBorrowDays() {
-        $subscriptionItem = $this->getMemberTypePackageItem();
-        if (isset($subscriptionItem->book_limit) && $subscriptionItem->book_limit) {
-           return $subscriptionItem->content_valid_period; 
-        }
-        return $this->borrowDays;
+        return $this->libraryPolicy->getBorrowDays() ?? $this->borrowDays;
     }
 
     public function getBookCopy() {
@@ -134,18 +114,39 @@ class BorrowBookForm extends \yii\base\Model {
 	
 	public function getBookBorrowedRecords() {
 		if (!isset($this->_bookBorrowed)) {
-			$this->_bookBorrowed = BookBorrow::find()->andWhere([
-				'user_id' => $this->user->id,
-				'returned_at' => null,
-				'returned_by' => null,
-			])->all();
+			$this->_bookBorrowed = BookBorrow::find()
+                ->forUser($this->user)
+                ->notReturned()
+                ->excludeReserved()->all();
 		}
 		return $this->_bookBorrowed;
 	}
+
+    public function getBookReservedRecords() {
+		if (!isset($this->_bookReserved)) {
+            $this->_bookReserved =  BookBorrow::find()
+                ->forUser($this->user)
+                ->notReturned()
+                ->reserved()->all();
+        }
+		return $this->_bookReserved;
+    }
+
+    public function getTotalBookBorrowedOrReserved() {
+        return count($this->bookBorrowedRecords) + count($this->bookReservedRecords);
+    }
 	
 	public function getBookBorrowedInfo() {
 		$lines = [];
 		foreach ($this->getBookBorrowedRecords() as $record) {
+			$lines[] = $record->bookCopy->book->title;
+		}
+		return $lines;
+	}
+	
+	public function getBookReservedInfo() {
+		$lines = [];
+		foreach ($this->getBookReservedRecords() as $record) {
 			$lines[] = $record->bookCopy->book->title;
 		}
 		return $lines;

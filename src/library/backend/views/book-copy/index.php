@@ -3,6 +3,8 @@ use yii\helpers\Html;
 use yii\widgets\ActiveForm;
 use Picqer\Barcode\BarcodeGeneratorSVG;
 use ant\library\models\BookCopy;
+use ant\library\models\BookPublisher;
+use ant\category\models\Category;
 /* @var $this yii\web\View */
 $generator = new Picqer\Barcode\BarcodeGeneratorSVG();
 ?>
@@ -10,6 +12,8 @@ $generator = new Picqer\Barcode\BarcodeGeneratorSVG();
 <?php $this->beginBlock('content-header-buttons') ?>
     <?= Html::a('Print Stickers', ['print-sticker'], ['class' => 'btn btn-sm btn-primary']) ?>
     <?= Html::a('Re-print Stickers', ['print-sticker', 'status' => BookCopy::STICKER_LABEL_NEED_REPRINT], ['class' => 'btn btn-sm btn-primary']) ?>
+	
+	<?= Html::a('Add New Book', ['/library/backend/book/create'], ['class' => 'btn btn-success']) ?>
 <?php $this->endBlock() ?>
 
 <?php /*
@@ -22,34 +26,68 @@ $generator = new Picqer\Barcode\BarcodeGeneratorSVG();
         </div>
     </div>
 */ ?>
-
+<div class="table-responsive">
 <?= \yii\grid\GridView::widget([
 	'dataProvider' => $dataProvider,
 	'filterModel' => $model,
 	'columns' => [
+		// [
+		// 	'class' => '\yii\grid\CheckboxColumn',
+		// ],
 		[
-			'class' => '\yii\grid\CheckboxColumn',
+			'attribute' => BookCopy::barcodeAttribute() == 'id' ? 'barcodeId' : BookCopy::barcodeAttribute(),
+			'value' => 'barcode',
+		],
+		// [
+		// 	'attribute' => 'book_id',
+		// 	'label' => 'Book Id',
+		// ],
+		[
+			'attribute' => 'isbn',
+			'value' => 'book.isbn',
 		],
 		[
-			'attribute' => 'barcodeId',
-			//'label' => 'Barcode ID',
-			'value' => function($model) {
-				return $model->id;
-			}
+			'attribute' => 'title',
+			'value'=> 'book.title',
+			'headerOptions' => [
+				'style' => 'min-width: 200px',
+			],
 		],
 		[
-			'attribute' => 'book_id',
-			'label' => 'Book Id',
+			'label' => 'Category 分类',
+			'attribute' => 'category',
+			'value' => 'defaultCategoryName',
+			'headerOptions' => ['style' => 'min-width: 100px'],
+			// 'filter' => Category::find()->count() > 200 ? null : Select2::widget([
+			// 	'model' => $searchModel,
+			// 	'attribute' => 'category_ids',
+			// 	'data' => ArrayHelper::map(Category::find()->all(), 'id', 'title'),
+			// 	'size' => Select2::SMALL,
+			// 	'options' => ['placeholder' => ''],
+			// 	'pluginOptions' => [
+			// 		'allowClear' => true
+			// 	],
+			// ]),
 		],
-		'book.isbn',
+		// 'book.category_code',
+		'bookShelfCode',
 		[
-			'attribute'=> 'title',
-			'value' => function($model) {
-				return $model->book->title;
-			}
+			'filter' => BookPublisher::find()->count() > 100 ? null : Select2::widget([
+				//'value' => $model,
+				//'name' => 'IncidentSearch[customer_id]',
+				'model' => $searchModel,
+				'attribute' => 'publisher_id',
+				'data' => ArrayHelper::map(BookPublisher::find()->all(), 'id', 'name'),
+				'size' => Select2::SMALL,
+				'options' => ['placeholder' => ''],
+				'pluginOptions' => [
+					'allowClear' => true
+				],
+			]),
+			'attribute' => 'publisher',
+			'value' => 'book.publisher.name',
+			'label' => 'Publisher 出版社',
 		],
-		'book.category_code',
-		'book.bookShelfCode',
 		[
 			'format' => 'raw',
 			'label' => 'Barcode',
@@ -63,7 +101,7 @@ $generator = new Picqer\Barcode\BarcodeGeneratorSVG();
 		//'updated_by',
 		[
 			'class' => 'ant\grid\ActionColumn',
-			'template' => '{view} {update} {delete} {mark-sticker-label}',
+			'template' => '{update} {delete} {mark-sticker-label}',
 			'buttons' => [
 				'mark-sticker-label' => function($url, $model) {
 					if ($model->sticker_label_status != BookCopy::STICKER_LABEL_NEED_REPRINT) {
@@ -80,3 +118,4 @@ $generator = new Picqer\Barcode\BarcodeGeneratorSVG();
 		],
 	],
 ]) ?>
+</div>

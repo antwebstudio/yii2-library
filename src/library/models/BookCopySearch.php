@@ -14,6 +14,9 @@ class BookCopySearch extends BookCopy
 {
 	public $barcodeId;
 	public $title;
+    public $isbn;
+    public $publisher;
+    public $category;
 	
     /**
      * {@inheritdoc}
@@ -22,7 +25,7 @@ class BookCopySearch extends BookCopy
     {
         return [
             [['id', 'book_id', 'status', 'created_by', 'barcodeId'], 'integer'],
-            [['title', 'created_at'], 'safe'],
+            [['title', 'created_at', 'custom_barcode', 'publisher', 'isbn', self::barcodeAttribute()], 'safe'],
         ];
     }
 
@@ -45,7 +48,11 @@ class BookCopySearch extends BookCopy
     public function search($params)
     {
 		//throw new \Exception($this->barcodeId);
-        $query = BookCopy::find()->alias('bookCopy')->joinWith('book book');
+        $query = BookCopy::find()->alias('bookCopy')
+            ->joinWith(['book book' => function($q) {
+                $q->joinWith('publisher publisher');
+                // $q->joinWith('categories categories');
+            }]);
 
         // add conditions that should always apply here
 
@@ -70,6 +77,10 @@ class BookCopySearch extends BookCopy
             'created_by' => $this->created_by,
         ]);
 		
+        $query->andFilterWhere(['like', 'book.isbn', $this->isbn]);
+        $query->andFilterWhere(['like', 'custom_barcode', $this->custom_barcode]);
+        $query->andFilterWhere(['like', 'publisher.name', $this->publisher]);
+        // $query->andFilterWhere(['like', 'categories.name', $this->category]);
 		$query->andFilterWhere(['like', 'book.title', (new Chinese)->to(Chinese::CHS, $this->title)]);
 
         return $dataProvider;

@@ -21,6 +21,7 @@ $userIc = isset($model->user) ? $model->user->getIdentityId()->andWhere(['type' 
             借书期限：<?= $model->getBookBorrowDays() ?> 天 | 会员最多可借 <?= $model->getBookLimit() ?> 本书<br/>
             所需订金：<?= $model->getTotalDepositAmountNeeded() ?><br/>
             会员类型：<?= $model->getMemberTypeName() ?><br/>
+            已经借出/预留：<?= $model->totalBookBorrowedOrReserved ?><br/>
         </div>
     <?php else: ?>
         <div class="alert alert-warning">
@@ -34,11 +35,11 @@ $userIc = isset($model->user) ? $model->user->getIdentityId()->andWhere(['type' 
                 <div class="panel-body">
                     <?php if (isset($model->bookCopy->book)): ?>
                         <?= \yii\widgets\DetailView::widget([
-                            'model' => $model->bookCopy->book,
+                            'model' => $model->bookCopy,
                             'attributes' => [
-                                // 'bookCopy.reference',
-                                'title',
-                                'languageText',
+                                'barcode',
+                                'book.title',
+                                'book.languageText',
                             ],
                         ]) ?>
                     <?php endif ?>
@@ -70,6 +71,13 @@ $userIc = isset($model->user) ? $model->user->getIdentityId()->andWhere(['type' 
                                         return '<li>'.$row.'</li>';
                                     }).'</ul>',
                                 ],
+                                [
+                                    'format' => 'html',
+                                    'label' => 'Reserved Book',
+                                    'value' => '<ul>'.Arr::implode('', $model->getBookReservedInfo(), function($row) {
+                                        return '<li>'.$row.'</li>';
+                                    }).'</ul>',
+                                ],
                             ],
                         ]) ?>
                     <?php endif ?>
@@ -84,7 +92,14 @@ $userIc = isset($model->user) ? $model->user->getIdentityId()->andWhere(['type' 
         <?= $form->field($model, 'userId')->hiddenInput()->label(false) ?>
         <?= $form->field($model, 'confirm')->hiddenInput(['value' => 1])->label(false) ?>
 
-        <?= Html::submitButton('Confirm', ['class' => 'btn btn-primary']) ?>
+        <?php if (isset($model->bookCopy)): ?>
+            <?php if ($model->isBookBorrowed): ?>
+                <?= $form->field($model, 'reserve')->hiddenInput(['value' => 1])->label(false) ?>
+                <?= Html::submitButton('Reserve', ['class' => 'btn btn-primary']) ?>
+            <?php else: ?>
+                <?= Html::submitButton('Confirm', ['class' => 'btn btn-primary']) ?>
+            <?php endif ?>
+        <?php endif ?>
         <?= Html::a('Cancel', ['index'], ['class' => 'btn btn-default']) ?>
     <?php ActiveForm::end() ?>
 <?php else: ?>
