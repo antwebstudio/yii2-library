@@ -16,9 +16,17 @@ $userIc = isset($model->user) ? $model->user->getIdentityId()->andWhere(['type' 
 ?>
 
 <?php if ($showDetail): ?>
-    <div class="alert alert-info">
-        借书期限：<?= $model->borrowDays ?> 天 | 会员最多可借 <?= $model->bookLimitPerMember ?> 本书
-    </div>
+    <?php if ($model->user->isMember): ?>
+        <div class="alert alert-info">
+            借书期限：<?= $model->getBookBorrowDays() ?> 天 | 会员最多可借 <?= $model->getBookLimit() ?> 本书<br/>
+            所需订金：<?= $model->getTotalDepositAmountNeeded() ?><br/>
+            会员类型：<?= $model->getMemberTypeName() ?><br/>
+        </div>
+    <?php else: ?>
+        <div class="alert alert-warning">
+            非会员 / 会员籍过期 Non-member / Membership expired
+        </div>
+    <?php endif ?>
     <div class="row">
         <div class="col-md-6">
             <div class="panel panel-default">

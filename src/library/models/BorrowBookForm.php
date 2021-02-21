@@ -127,6 +127,10 @@ class BorrowBookForm extends \yii\base\Model {
         }
         return $this->_user;
     }
+
+    public function getIsBookBorrowed() {
+        return $this->bookCopy->isBorrowed;
+    }
 	
 	public function getBookBorrowedRecords() {
 		if (!isset($this->_bookBorrowed)) {
