@@ -55,6 +55,13 @@ class BorrowBookForm extends \yii\base\Model {
         }
     }
 
+    public function beforeValidate() {
+        if (!isset($this->bookCopyId) || trim($this->bookCopyId) == '') {
+            $this->bookCopyId = $this->bookCopy->id;
+        }
+        return parent::beforeValidate();
+    }
+
     public function save() {
         if ($this->validate()) {
             if ($this->reserve) {

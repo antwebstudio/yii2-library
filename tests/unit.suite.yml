@@ -8,4 +8,5 @@ modules:
         - Asserts
         - \Helper\Unit
         - Yii2:
+            cleanup: true
             configFile: 'tests/config/unit.php'

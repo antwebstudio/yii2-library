@@ -10,6 +10,7 @@ return [
 		'@common/migrations' => '@vendor/inspirenmy/yii2-core/src/common/migrations',
 		'common/modules/moduleManager' => dirname(dirname(__DIR__)).'/vendor/inspirenmy/yii2-core/src/common/modules/moduleManager',
         '@common/rbac/views' => '@vendor/inspirenmy/yii2-core/src/common/rbac/views',
+        '@project/config' => __DIR__,
 	],
     'components' => [
         'i18n' => [

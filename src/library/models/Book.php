@@ -26,6 +26,8 @@ use ant\library\models\CategoryCode;
  */
 class Book extends \yii\db\ActiveRecord
 {
+    use \ant\db\traits\ActiveRecordShortcut;
+    
     const LANGUAGE_ENGLISH = 2;
     const LANGUAGE_CHINESE = 1;
 	const LANGUAGE_MALAY = 3;

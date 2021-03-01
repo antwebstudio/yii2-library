@@ -26,7 +26,7 @@ class BorrowController extends \yii\web\Controller {
             $model->scenario = $model::SCENARIO_CUSTOM_BARCODE;
         }
 
-        if ($model->load(Yii::$app->request->post()) && $model->confirm && $model->save()) {
+        if ($model->load(Yii::$app->request->post()) && $model->validate() && $model->confirm && $model->save()) {
 			
             if ($model->reserve) {
                 Yii::$app->session->setFlash('library', 'Book copy is successfully reserved. ');

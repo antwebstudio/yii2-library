@@ -24,6 +24,7 @@ use ant\user\models\User;
 class BookBorrow extends \yii\db\ActiveRecord
 {
     const STATUS_RESERVED = 9;
+    const STATUS_BORROWED = 0;
 
     /**
      * {@inheritdoc}

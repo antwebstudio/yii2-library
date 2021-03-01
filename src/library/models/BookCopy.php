@@ -45,6 +45,7 @@ class BookCopy extends \yii\db\ActiveRecord
         return [
             [['book_id'], 'required'],
             [['book_id', 'status', 'created_by'], 'integer'],
+            [['status', 'is_trashed', 'sticker_label_status'], 'default', 'value' => 0],
             [['created_at', 'custom_barcode', 'shelf_mark'], 'safe'],
         ];
     }
@@ -84,11 +85,17 @@ class BookCopy extends \yii\db\ActiveRecord
         $model->borrow_days = $day;
         $model->status = BookBorrow::STATUS_RESERVED;
 
-        $model->expireAfterDays($day, true);
+        $borrow = $this->getBookBorrow()->expireLast()->notExpired()->one();
+
+        if (isset($borrow) && isset($borrow->expireAt)) {
+            $model->setExpireAt($borrow->expireAt->addDays($day));
+        } else {
+            $model->expireAfterDays($day, true);
+        }
 
         if (!$model->save()) throw new \Exception(print_r($model->errors, 1));
 
-        return true;
+        return $model;
     }
 
     public function lendTo($user, $day) {
@@ -101,7 +108,7 @@ class BookCopy extends \yii\db\ActiveRecord
 
         if (!$model->save()) throw new \Exception(print_r($model->errors, 1));
 
-        return true;
+        return $model;
     }
 	
 	public function getBarcode() {
@@ -114,17 +121,33 @@ class BookCopy extends \yii\db\ActiveRecord
     }
 
     public function getBookBorrow($notReturnedOnly = false) {
+        if (YII_DEBUG && $notReturnedOnly) deprecate();
+
         $query = $this->hasMany(BookBorrow::className(), ['book_copy_id' => 'id']);
         if ($notReturnedOnly) $query->andWhere(['returned_at' => null]);
         return $query;
     }
 
     public function getIsAvailableForBorrow() {
-        return $this->getBookBorrow(true)->count() == 0;
+        return !$this->isBorrowed && !$this->isReserved;
+    }
+
+    public function isAvailableForBorrow($user) {
+        $userId = is_object($user) ? $user->id : $user;
+        return !$this->isBorrowed && (!$this->isReserved || $userId == $this->currentReservee->id);
+    }
+
+    public function getCurrentReservee() {
+        $borrow = $this->getBookBorrow()->reserved()->notExpired()->one();
+        return $borrow->user ?? null;
     }
 
     public function getIsBorrowed() {
-        return $this->getBookBorrow(true)->count() > 0;
+        return $this->getBookBorrow()->borrowed()->notReturned()->notExpired()->count() > 0;
+    }
+
+    public function getIsReserved() {
+        return $this->getBookBorrow()->reserved()->notExpired()->count() > 0;
     }
 
     public function getBookShelfCode() {
