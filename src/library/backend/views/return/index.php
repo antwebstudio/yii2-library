@@ -6,6 +6,7 @@ use yii\helpers\Html;
 use yii\web\JsExpression;
 use ant\helpers\ArrayHelper as Arr;
 use ant\library\models\BookBorrow;
+use ant\library\models\ReturnBookForm;
 
 $this->title = 'Return Book';
 
@@ -60,6 +61,7 @@ $expiredBorrowDataProvider = new \yii\data\ActiveDataProvider([
     </div>
 
     <?php $form = ActiveForm::begin() ?>
+        <?= $form->field($model, 'customBarcode')->hiddenInput()->label(false) ?>
         <?= $form->field($model, 'bookCopyId')->hiddenInput()->label(false) ?>
         <?= $form->field($model, 'confirm')->hiddenInput(['value' => 1])->label(false) ?>
 
@@ -68,7 +70,11 @@ $expiredBorrowDataProvider = new \yii\data\ActiveDataProvider([
 <?php else: ?>
 
     <?php $form = ActiveForm::begin() ?>
-        <?= $form->field($model, 'bookCopyId')->textInput() ?>
+        <?php if ($model->scenario == $model::SCENARIO_CUSTOM_BARCODE): ?>
+            <?= $form->field($model, 'customBarcode')->textInput() ?>
+        <?php else: ?>
+            <?= $form->field($model, 'bookCopyId')->textInput() ?>
+        <?php endif ?>
 
         <?= Html::submitButton('Submit', ['class' => 'btn btn-primary']) ?>
     <?php ActiveForm::end() ?>

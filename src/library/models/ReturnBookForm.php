@@ -4,7 +4,10 @@ namespace ant\library\models;
 use ant\user\models\User;
 
 class ReturnBookForm extends \yii\base\Model {
+    const SCENARIO_CUSTOM_BARCODE = 'custom_barcode';
+    
     public $bookCopyId;
+    public $customBarcode;
     public $confirm;
 
     protected $_bookCopy;
@@ -15,7 +18,13 @@ class ReturnBookForm extends \yii\base\Model {
         return [
             [['bookCopyId'], 'exist', 'skipOnError' => true, 'targetClass' => BookCopy::className(), 'targetAttribute' => ['bookCopyId' => 'id']],
             [['bookCopyId'], 'number'],
-            [['bookCopyId'], 'required'],
+            [['bookCopyId'], 'required', 'except' => self::SCENARIO_CUSTOM_BARCODE],
+            [['customBarcode'], 'required', 'on' => self::SCENARIO_CUSTOM_BARCODE],
+            [['customBarcode'], function($attribute, $params, $validator) {
+                if (!isset($this->bookBorrow)) {
+                    $this->addError($attribute, $validator->message);
+                }
+            }, 'message' => 'Book borrow record is not exist.', 'on' => self::SCENARIO_CUSTOM_BARCODE],
             [['confirm'], 'safe'],
             [['bookCopyId'], 'ant\library\validators\BookAvailableValidator', 'not' => true],
         ];
@@ -35,21 +44,29 @@ class ReturnBookForm extends \yii\base\Model {
 
     public function getBookCopy() {
         if (!isset($this->_bookCopy)) {
-            $this->_bookCopy = BookCopy::findOne($this->bookCopyId);
+            if ($this->scenario == self::SCENARIO_CUSTOM_BARCODE) {
+                $this->_bookCopy = BookCopy::find()->andWhere(['custom_barcode' => $this->customBarcode])->one();
+            } else {
+                $this->_bookCopy = BookCopy::findOne($this->bookCopyId);
+            }
         }
         return $this->_bookCopy;
     }
 
     public function getBookBorrow() {
         if (!isset($this->_bookBorrowRecord)) {
-            $this->_bookBorrowRecord = $this->bookCopy->getBookBorrow(true)->one();
+            if (isset($this->bookCopy)) {
+                $this->_bookBorrowRecord = $this->bookCopy->getBookBorrow(true)->one();
+            }
         }
         return $this->_bookBorrowRecord;
     }
 
     public function getUser() {
         if (!isset($this->_user)) {
-            $this->_user = User::findOne($this->bookBorrow->user_id);
+            if (isset($this->bookBorrow)) {
+                $this->_user = User::findOne($this->bookBorrow->user_id);
+            }
         }
         return $this->_user;
     }

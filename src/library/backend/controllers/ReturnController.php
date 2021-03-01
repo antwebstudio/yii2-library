@@ -3,10 +3,14 @@ namespace ant\library\backend\controllers;
 
 use Yii;
 use ant\library\models\ReturnBookForm;
+use ant\library\models\BookCopy;
 
 class ReturnController extends \yii\web\Controller {
     public function actionIndex() {
         $model = new ReturnBookForm;
+        if (BookCopy::barcodeAttribute() == 'custom_barcode') {
+            $model->scenario = $model::SCENARIO_CUSTOM_BARCODE;
+        }
 
         if ($model->load(Yii::$app->request->post())) {
             if ($model->confirm && $model->save()) {
