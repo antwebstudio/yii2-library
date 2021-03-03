@@ -39,7 +39,8 @@ class BookBorrowQuery extends \yii\db\ActiveQuery {
     }
 
     public function excludeReserved() {
-        return $this->andWhere(['NOT', ['status' => BookBorrow::STATUS_RESERVED]]);
+        return $this->andWhere(['NOT', ['status' => BookBorrow::STATUS_RESERVED]])
+        ->andWhere(['NOT', ['status' => BookBorrow::STATUS_CLAIMED]]);
     }
 
     public function borrowed() {

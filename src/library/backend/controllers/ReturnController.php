@@ -15,12 +15,25 @@ class ReturnController extends \yii\web\Controller {
         if ($model->load(Yii::$app->request->post())) {
             if ($model->confirm && $model->save()) {
 				\Yii::$app->session->setFlash('success', 'Book is successfully returned. ');
+
+                // Next step after the book is returned
+                return $this->redirect(['/library/backend/return/returned', 'bookCopy' => $model->bookCopy->id]);
+
+                // Redirect to list of borrowed book page
                 return $this->redirect(['/library/backend/borrow/borrowed', 'user' => $model->user->id]);
             }
         }
 
         return $this->render($this->action->id, [
             'model' => $model,
+        ]);
+    }
+
+    public function actionReturned($bookCopy) {
+        $bookCopy = BookCopy::findOrFail($bookCopy);
+        return $this->render($this->action->id, [
+            'bookCopy' => $bookCopy,
+            'skipUrl' => ['/library/backend/borrow/borrowed'],
         ]);
     }
 

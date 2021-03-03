@@ -55,6 +55,7 @@ class M181030065358_library_permission extends Migration
 			],
 			\ant\library\backend\controllers\ReturnController::class => [
                 'index' => ['Return a book', [Role::ROLE_ADMIN]],
+                'returned' => ['Return a book', [Role::ROLE_ADMIN]],
 			],
 			\ant\library\backend\controllers\MemberController::class => [
                 'index' => ['Manage members', [Role::ROLE_ADMIN]],
