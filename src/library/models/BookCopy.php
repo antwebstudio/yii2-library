@@ -108,6 +108,16 @@ class BookCopy extends \yii\db\ActiveRecord
 
         if (!$model->save()) throw new \Exception(print_r($model->errors, 1));
 
+        // Update current reservation, if have
+        $borrow = $this->getBookBorrow()->expireFirst()->reserved()->notExpired()->one();
+        if (isset($borrow)) {
+            if ($borrow->status != BookBorrow::STATUS_RESERVED) {
+                throw new \Exception('Unexpected status value: "'.$borrow->status.'"');
+            }
+            $borrow->status = BookBorrow::STATUS_CLAIMED;
+            if (!$borrow->save()) throw new \Exception(print_r($model->errors, 1));
+        }
+
         return $model;
     }
 	
@@ -138,7 +148,7 @@ class BookCopy extends \yii\db\ActiveRecord
     }
 
     public function getCurrentReservee() {
-        $borrow = $this->getBookBorrow()->reserved()->notExpired()->one();
+        $borrow = $this->getBookBorrow()->expireFirst()->reserved()->notExpired()->one();
         return $borrow->user ?? null;
     }
 

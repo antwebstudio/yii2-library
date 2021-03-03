@@ -6,6 +6,7 @@ use ant\user\models\User;
 
 class BorrowBookForm extends \yii\base\Model {
     const SCENARIO_CUSTOM_BARCODE = 'custom_barcode';
+
     public $bookCopyId;
     public $userId;
     public $confirm;
@@ -36,7 +37,7 @@ class BorrowBookForm extends \yii\base\Model {
             [['customBarcode'], 'required', 'on' => self::SCENARIO_CUSTOM_BARCODE],
             [['userId'], 'required'],
             [['confirm', 'reserve'], 'safe'],
-            [['bookCopyId'], 'ant\library\validators\BookAvailableValidator', 'when' => function() {
+            [['bookCopyId'], 'ant\library\validators\BookAvailableValidator', 'userIdAttribute' => 'userId', 'when' => function() {
                 return !$this->reserve;
             }],
             [['userId'], 'ant\member\validators\MembershipValidator'],

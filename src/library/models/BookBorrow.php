@@ -25,6 +25,7 @@ class BookBorrow extends \yii\db\ActiveRecord
 {
     const STATUS_RESERVED = 9;
     const STATUS_BORROWED = 0;
+    const STATUS_CLAIMED = 8; // For reservation
 
     /**
      * {@inheritdoc}
