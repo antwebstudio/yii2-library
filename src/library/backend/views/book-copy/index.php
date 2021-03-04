@@ -100,8 +100,32 @@ $generator = new Picqer\Barcode\BarcodeGeneratorSVG();
 		//'updated_at',
 		//'updated_by',
 		[
+			'label' => 'Borrowed?',
+			'attribute' => 'isBorrowed',
+			'format' => 'html',
+			'value' => function ($model) {
+				if ($model->isBorrowed) {
+					$borrow = $model->getBookBorrow()->expireLast()->notReturned()->excludeReserved()->one();
+					$until = $borrow->expireAt->format('Y-m-d');
+				}
+				return $model->isBorrowed ? 'Yes<br/>'.$until : 'No';
+			}
+		],
+		[
+			'label' => 'Reserved?',
+			'attribute' => 'isReserved',
+			'format' => 'html',
+			'value' => function ($model) {
+				if ($model->isReserved) {
+					$borrow = $model->getBookBorrow()->expireLast()->reserved()->one();
+					$until = $borrow->expireAt->format('Y-m-d');
+				}
+				return $model->isReserved ? 'Yes<br/>'.$until : 'No';
+			}
+		],
+		[
 			'class' => 'ant\grid\ActionColumn',
-			'template' => '{update} {delete} {mark-sticker-label}',
+			'template' => '{view} {update} {delete} {mark-sticker-label}',
 			'buttons' => [
 				'mark-sticker-label' => function($url, $model) {
 					if ($model->sticker_label_status != BookCopy::STICKER_LABEL_NEED_REPRINT) {

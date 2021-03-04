@@ -43,6 +43,7 @@ class BookBorrow extends \yii\db\ActiveRecord
         return [
             [
                 'class' => 'ant\behaviors\Expirable',
+                'modelClass' => get_class($this),
             ],
             [
                 'class' => \yii\behaviors\BlameableBehavior::className(),

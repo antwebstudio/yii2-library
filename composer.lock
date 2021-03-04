@@ -655,7 +655,7 @@
             "version": "v3.4.1",
             "source": {
                 "type": "git",
-                "url": "git@github.com:twbs/bootstrap.git",
+                "url": "https://github.com/twbs/bootstrap.git",
                 "reference": "68b0d231a13201eb14acd3dc84e51543d16e5f7e"
             },
             "dist": {
@@ -1074,12 +1074,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/guzzle/psr7.git",
-                "reference": "f47ece9e6e8ce74e3be04bef47f46061dc18c095"
+                "reference": "2f3e4f6cf8fd4aad7624c90a94f0ab38fde25976"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/guzzle/psr7/zipball/f47ece9e6e8ce74e3be04bef47f46061dc18c095",
-                "reference": "f47ece9e6e8ce74e3be04bef47f46061dc18c095",
+                "url": "https://api.github.com/repos/guzzle/psr7/zipball/2f3e4f6cf8fd4aad7624c90a94f0ab38fde25976",
+                "reference": "2f3e4f6cf8fd4aad7624c90a94f0ab38fde25976",
                 "shasum": ""
             },
             "require": {
@@ -1137,7 +1137,7 @@
                 "uri",
                 "url"
             ],
-            "time": "2020-12-08T11:45:39+00:00"
+            "time": "2021-03-02T18:57:24+00:00"
         },
         {
             "name": "hashids/hashids",
@@ -5105,12 +5105,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/yiisoft/yii2-framework.git",
-                "reference": "b342c21892ecaa7419ce14c5974ae345f445a7af"
+                "reference": "7ac20a051457c0403ba47da7385d6eb08854a7d9"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/yiisoft/yii2-framework/zipball/b342c21892ecaa7419ce14c5974ae345f445a7af",
-                "reference": "b342c21892ecaa7419ce14c5974ae345f445a7af",
+                "url": "https://api.github.com/repos/yiisoft/yii2-framework/zipball/7ac20a051457c0403ba47da7385d6eb08854a7d9",
+                "reference": "7ac20a051457c0403ba47da7385d6eb08854a7d9",
                 "shasum": ""
             },
             "require": {
@@ -5211,7 +5211,7 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2021-03-01T20:02:28+00:00"
+            "time": "2021-03-03T10:18:06+00:00"
         },
         {
             "name": "yiisoft/yii2-authclient",

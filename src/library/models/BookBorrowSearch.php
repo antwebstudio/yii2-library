@@ -43,7 +43,7 @@ class BookBorrowSearch extends BookBorrow
      */
     public function search($params)
     {
-        $query = BookBorrow::find();
+        $query = BookBorrow::find()->alias('borrow');
 
         // add conditions that should always apply here
 
@@ -65,7 +65,7 @@ class BookBorrowSearch extends BookBorrow
 				$q->joinWith('identityId identityId');
 			}]);
 			
-			$query->andWhere(['identityId.value' => $this->userIdentityId])
+			$query->andWhere(['like', 'identityId.value', $this->userIdentityId])
 				->andWhere(['identityId.type' => 'ic']);
 		}
 
@@ -75,7 +75,7 @@ class BookBorrowSearch extends BookBorrow
             'book_copy_id' => $this->barcode,
             'user_id' => $this->user_id,
             'borrow_days' => $this->borrow_days,
-            'status' => $this->status,
+            'borrow.status' => $this->status,
             'returned_at' => $this->returned_at,
             'returned_by' => $this->returned_by,
             'created_at' => $this->created_at,

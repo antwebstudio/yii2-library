@@ -106,7 +106,7 @@ if ($tab == 'expired') {
         'createdBy.username',
         [
             'class' => 'yii\grid\ActionColumn',
-            'template' => '{renew} {cancel-reserve}',
+            'template' => '{renew} {cancel-reserve} {borrow}',
             'buttons' => [
                 'renew' => function($url, $model, $key) {
                     if (!$model->isReserved) {
@@ -117,6 +117,11 @@ if ($tab == 'expired') {
                 'cancel-reserve' => function($url, $model, $key) {
                     if ($model->isReserved) {
                         return Html::a('Cancel Reserve', ['/library/backend/borrow/cancel-reserve', 'id' => $model->id], ['data-method' => 'post', 'class' => 'btn btn-default']);
+                    }
+                },
+                'borrow' => function($url, $model, $key) {
+                    if (!$model->bookCopy->isBorrowed) {
+                        return Html::a('Borrow', ['/library/backend/return/returned', 'bookCopy' => $model->bookCopy->id], ['class' => 'btn btn-dark']);
                     }
                 }
             ],

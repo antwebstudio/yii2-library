@@ -55,6 +55,14 @@ class BookCopyController extends \yii\web\Controller
 			'model' => $model,
         ]);
     }
+
+    public function actionView($id) {
+        $model = BookCopy::findOrFail($id);
+
+        return $this->render($this->action->id, [
+            'model' => $model,
+        ]);
+    }
 	
 	public function actionPrintSticker() {
 		return $this->render($this->action->id, [
