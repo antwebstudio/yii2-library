@@ -31,10 +31,15 @@ class ReturnController extends \yii\web\Controller {
 
     public function actionReturned($bookCopy) {
         $bookCopy = BookCopy::findOrFail($bookCopy);
-        return $this->render($this->action->id, [
-            'bookCopy' => $bookCopy,
-            'skipUrl' => ['/library/backend/borrow/borrowed'],
-        ]);
+
+        if ($bookCopy->currentReservee) {
+            return $this->render($this->action->id, [
+                'bookCopy' => $bookCopy,
+                'skipUrl' => ['/library/backend/borrow/borrowed'],
+            ]);
+        } else {
+            return $this->redirect(['index']);
+        }
     }
 
     public function actionAjaxUsers($q) {
