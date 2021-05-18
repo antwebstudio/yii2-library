@@ -266,6 +266,10 @@ class Book extends \yii\db\ActiveRecord
 
     }
 
+    public function getImageFilename() {
+        return $this->image ?? $this->isbn;
+    }
+
     public function beforeValidate() {
         // Process category_ids
         $categoryIds = [];

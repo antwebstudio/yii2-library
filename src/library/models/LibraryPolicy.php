@@ -26,7 +26,7 @@ class LibraryPolicy {
     }
 
     public function getRenewDays() {
-        return $this->_item->resume_borrowable_period ?? 0;
+        return $this->_item->content_valid_period ?? 0;
     }
 
     public function getBorrowDays() {
