@@ -156,7 +156,7 @@ class Book extends \yii\db\ActiveRecord
 				// Title
 				if ($value != '') {
 					$value = (new \SteelyWing\Chinese\Chinese)->to(\SteelyWing\Chinese\Chinese::CHS, $value);
-					$category = \ant\category\models\Category::ensureByTitle($value, 'book');
+					$category = \ant\category\models\Category::ensureByTitle($value, self::CATEGORY_TYPE);
 					if (!isset($category)) throw new \Exception('Something is wrong');
 					return [$category->id];
 				}
@@ -276,10 +276,13 @@ class Book extends \yii\db\ActiveRecord
         if (is_array($this->category_ids)) {
             foreach ($this->category_ids as $id) {
                 if (!is_numeric($id)) {
-                    $newCategory = new Category;
-                    $newCategory->title = substr($id, strlen('new:'));
-                    $newCategory->type = self::CATEGORY_TYPE;
-                    if (!$newCategory->save()) throw new \Exception(print_r($newCategory->errors, 1));
+                    $categoryTitle = substr($id, strlen('new:'));
+                    $newCategory = \ant\category\models\Category::ensureByTitle($categoryTitle, self::CATEGORY_TYPE);
+
+                    // $newCategory = new Category;
+                    // $newCategory->title = $categoryTitle;
+                    // $newCategory->type = self::CATEGORY_TYPE;
+                    // if (!$newCategory->save()) throw new \Exception(print_r($newCategory->errors, 1));
 
                     $categoryIds[] = $newCategory->id;
                 } else {
