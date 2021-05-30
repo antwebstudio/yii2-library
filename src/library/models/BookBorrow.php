@@ -5,6 +5,7 @@ namespace ant\library\models;
 use Yii;
 use yii\db\Expression;
 use ant\user\models\User;
+use ant\contact\models\Contact;
 
 /**
  * This is the model class for table "ks_library_book_borrow".
@@ -99,6 +100,14 @@ class BookBorrow extends \yii\db\ActiveRecord
 	public function getCreatedBy() {
 		return $this->hasOne(User::class, ['id' => 'created_by']);
 	}
+
+    public function getContact() {
+        return $this->hasOne(Contact::class, ['id' => 'contact_id']);
+    }
+
+    public function getAddress() {
+        return $this->contact->address;
+    }
 
     /**
      * @return \yii\db\ActiveQuery

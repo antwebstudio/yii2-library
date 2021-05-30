@@ -91,8 +91,16 @@ if ($tab == 'expired') {
 			'value' => function($model) {
                 $userIc = $model->user->getIdentityId()->andWhere(['type' => 'ic'])->one();
                 $email = $model->user->email;
-                return '<b>IC:</b> '.(isset($userIc) ? $userIc->value : '')
+                $html = '<b>IC:</b> '.(isset($userIc) ? $userIc->value : '')
                     .'<br/><b>Email:</b> '.$email;
+
+                if (isset($model->contact)) {
+                    $html .= '<br/><b>Contact: </b>'.$model->contact->firstname.' '.$model->contact->lastname
+                        .'<br/>'.$model->contact->contact_number
+                        .'<br/>'.$model->getAddress()->fullAddressString
+                        .'<br/>'.$model->getAddress()->postcode.', '.$model->getAddress()->city;
+                }
+                return $html;
 			},
 		],
         [

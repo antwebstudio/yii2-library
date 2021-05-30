@@ -58,6 +58,10 @@ class BookBorrowSearch extends BookBorrow
             // $query->where('0=1');
             return $dataProvider;
         }
+
+        if ($this->barcode) {
+            $query->joinWith('bookCopy bookCopy');
+        }
 		
 		if ($this->userIdentityId) {
 			$query->joinWith(['user' => function($q) { 
@@ -65,14 +69,12 @@ class BookBorrowSearch extends BookBorrow
 				$q->joinWith('identityId identityId');
 			}]);
 			
-			$query->andWhere(['like', 'identityId.value', $this->userIdentityId])
-				->andWhere(['identityId.type' => 'ic']);
+			$query->andWhere(['like', 'identityId.value', $this->userIdentityId]);
 		}
 
         // grid filtering conditions
         $query->andFilterWhere([
             'id' => $this->id,
-            'book_copy_id' => $this->barcode,
             'user_id' => $this->user_id,
             'borrow_days' => $this->borrow_days,
             'borrow.status' => $this->status,
@@ -80,6 +82,14 @@ class BookBorrowSearch extends BookBorrow
             'returned_by' => $this->returned_by,
             'created_at' => $this->created_at,
             'created_by' => $this->created_by,
+        ]);
+
+        $query->andFilterWhere([
+            'or', [
+                'bookCopy.custom_barcode' => $this->barcode,
+            ], [
+                'book_copy_id' => $this->barcode,
+            ],
         ]);
 
         $query->andFilterWhere(['like', 'remark', $this->remark]);
