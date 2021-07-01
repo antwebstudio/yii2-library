@@ -81,7 +81,15 @@ class BookCopySearch extends BookCopy
         $query->andFilterWhere(['like', 'custom_barcode', $this->custom_barcode]);
         $query->andFilterWhere(['like', 'publisher.name', $this->publisher]);
         // $query->andFilterWhere(['like', 'categories.name', $this->category]);
-		$query->andFilterWhere(['like', 'book.title', (new Chinese)->to(Chinese::CHS, $this->title)]);
+		// $query->andFilterWhere(['like', 'book.title', (new Chinese)->to(Chinese::CHS, $this->title)]);
+        
+        $query->andFilterWhere([
+            'or', [
+                'like', 'book.title', (new Chinese)->to(Chinese::CHS, $this->title),
+            ], [
+                'like', 'book.title', (new Chinese)->to(Chinese::CHT, $this->title),
+            ],
+        ]);
 
         return $dataProvider;
     }
