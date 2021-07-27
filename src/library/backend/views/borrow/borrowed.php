@@ -83,6 +83,11 @@ if ($tab == 'expired') {
         [
             'attribute' => 'bookCopy.book.title',
             'label' => '书名 Title',
+            'format' => 'html',
+            'value' => function($model) {
+                $book = $model->bookCopy->book;
+                return $book->title.'<br/>('.$model->bookCopy->shelf_mark.')';
+            },
         ],
 		[
             'label' => '借书者 Member',

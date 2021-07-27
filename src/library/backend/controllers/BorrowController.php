@@ -55,6 +55,7 @@ class BorrowController extends \yii\web\Controller {
 			$searchModel->user_id = $user->id;
 		}
         $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
+        $dataProvider->sort->defaultOrder = ['created_at' => SORT_DESC];
 
         //$dataProvider = $model->search(Yii::$app->request->queryParams);
         

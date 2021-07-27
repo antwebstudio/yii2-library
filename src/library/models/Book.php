@@ -91,7 +91,7 @@ class Book extends \yii\db\ActiveRecord
             //[['title'], 'unique'],
 			//[['isbn'], 'unique'],
             [['title', 'isbn'], 'unique', 'targetAttribute' => ['title', 'isbn']],
-            [['title', 'small_title'], 'ant\validators\ChineseStringValidator'],
+            // [['title', 'small_title'], 'ant\validators\ChineseStringValidator'],
             [['newCopyQuantity'], 'integer', 'min' => 0],
             [['created_by', 'updated_by'], 'integer'],
             [['publisher_id'], 'integer', 'enableClientValidation' => false],
