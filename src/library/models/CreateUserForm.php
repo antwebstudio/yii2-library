@@ -21,6 +21,7 @@ class CreateUserForm extends \ant\web\FormModel {
 	public $userIp;
 	public $password;
 	public $confirmPassword;
+	public $reCaptcha;
 	public $roleName = [
 		self::TYPE_RK => ['rk-member', 'library-member'],
 		self::TYPE_LIBRARY => ['library-member'],
@@ -38,6 +39,14 @@ class CreateUserForm extends \ant\web\FormModel {
 			[['memberType'], 'required', 'message' => 'Please select member type. '],
 			[['agreeDeclaration', 'agreeTnc'], 'required', 'requiredValue' => 1, 'message' => 'Agreement needed to continue.'],
 			//[['agreeDeclaration', 'agreeTnc'], 'boolean'],
+			['reCaptcha', \himiklab\yii2\recaptcha\ReCaptchaValidator2::className(),
+				// 'secret' => 'your secret key', // unnecessary if reСaptcha is already configured
+				'when' => function() {
+					$key = env('RECAPTCHA_SECRET_KEY');
+					return trim($key) != '';
+				},
+				'uncheckedMessage' => 'Please check this to continue.'
+			],
 		]);
 	}
 	
