@@ -153,7 +153,7 @@ class BookCopy extends \yii\db\ActiveRecord
     }
 
     public function getIsBorrowed() {
-        return $this->getBookBorrow()->borrowed()->notReturned()->notExpired()->count() > 0;
+        return $this->getBookBorrow()->borrowed()->notReturned()->count() > 0;
     }
 
     public function getIsReserved() {
